@@ -9,8 +9,8 @@ public class HomeController(ILogger<HomeController> _logger, SqliteContext _db) 
 {
     public IActionResult Index()
     {
-        _db.Add(new Plan() { Title = "gaga" });
-        _db.SaveChanges();
+        // _db.Add(new Plan() { Title = "gaga" });
+        // _db.SaveChanges();
         return View();
     }
 
