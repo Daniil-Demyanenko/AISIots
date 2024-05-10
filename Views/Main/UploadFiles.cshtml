@@ -1,0 +1,20 @@
+@model ExcelFilesModel
+
+@{
+    ViewData["Title"] = "Загруженные файлы";
+}
+@if (Model.LoadSuccessful)
+{
+    <h1>Успешно!</h1>
+    <ul>
+        @foreach (var file in Model.GetFileNames())
+        {
+            <li>@file</li>
+        }
+    </ul>
+}
+
+@if (!Model.LoadSuccessful)
+{
+    <h1>Незагружено!</h1>
+}

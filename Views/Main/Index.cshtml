@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+   
+    @using (Html.BeginForm("UploadFiles", "Main", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="file" name="files" multiple accept=".xls, .xlsx"/>
+        <input type="submit" value="Загрузить файлы"/>
+    }
+    
+</div>
