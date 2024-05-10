@@ -7,17 +7,24 @@ using AISIots.Models;
 
 namespace AISIots.Controllers;
 
-public class MainController : Controller
+public class MainController(SqliteContext _db) : Controller
 {
     public IActionResult Index()
     {
+        return View();
+    }
+    
+    [HttpPost]
+    public IActionResult Search(string? fileTitle)
+    {
+        
         return View();
     }
 
     [HttpPost("UploadFiles")]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)
     {
-        var excelFiles = await UploadExcelFilesModel.Create(files);
+        var excelFiles = await UploadExcelFilesModel.Create(files, _db);
 
         return View(excelFiles);
     }

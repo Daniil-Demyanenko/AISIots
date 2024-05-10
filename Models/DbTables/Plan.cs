@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AISIots.Models;
+namespace AISIots.Models.DbTables;
 
 public class Plan
 {

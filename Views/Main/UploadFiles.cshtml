@@ -1,3 +1,4 @@
+@using AISIots.Utils
 @model UploadExcelFilesModel
 
 @{
@@ -5,16 +6,16 @@
 }
 @if (Model.LoadSuccessful)
 {
-    <h1>Успешно!</h1>
+    <h1>Успешно загружено следующие файлы:</h1>
     <ul>
-        @foreach (var file in Model.Files)
+        @foreach (var file in Model.Files!.Where(x=>x.Info.Type != ExcelFileType.Undefined))
         {
-            <li>@file.Type - @file.Name</li>
+            <li>@file.Info.Type - @System.IO.Path.GetFileName(file.Path)</li>
         }
     </ul>
 }
 
 @if (!Model.LoadSuccessful)
 {
-    <h1>Незагружено!</h1>
+    <h1>Невыявлено подходящих для обработки файлов</h1>
 }

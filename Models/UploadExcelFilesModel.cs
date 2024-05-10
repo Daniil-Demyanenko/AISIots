@@ -1,3 +1,5 @@
+using AISIots.DAL;
+using AISIots.Models.DbTables;
 using AISIots.Utils;
 
 namespace AISIots.Models;
@@ -5,25 +7,36 @@ namespace AISIots.Models;
 public class UploadExcelFilesModel
 {
     public bool LoadSuccessful { get; private set; }
-    public readonly string? PathToDir;
-    public IEnumerable<(ExcelFileType Type, string Name)>? Files;
+    private readonly string? PathToDir;
+    public IEnumerable<(ExcelPatternMatchingResult Info, string Path)>? Files;
+    private SqliteContext? _db;
 
-    private UploadExcelFilesModel(bool loadSuccessful, string? pathToDir = null)
+    private UploadExcelFilesModel(bool loadSuccessful, string? pathToDir = null, SqliteContext? db = null)
     {
         LoadSuccessful = loadSuccessful;
         PathToDir = pathToDir;
+        _db = db;
 
         if (!LoadSuccessful) return;
+        
         Files = Directory.GetFiles(PathToDir!).Select(x =>
-            (ExcelPatternMatcher.GetTemplateType(x).Type, Path.GetFileName(x)));
+            (ExcelPatternMatcher.GetTemplateType(x), x));
+
+        List<RPD> rpds = new();
+        foreach (var f in Files.Where(x=> x.Info.Type == ExcelFileType.RPD))
+        {
+            using RPDParser parser = new(f.Info, f.Path);
+            rpds.Add(parser.Parse());
+        }
+        
+        AddToDb(rpds);
     }
 
-    public static async Task<UploadExcelFilesModel> Create(List<IFormFile>? files)
+    public static async Task<UploadExcelFilesModel> Create(List<IFormFile>? files, SqliteContext db)
     {
-        bool isSuccessful = false;
-        if (files == null) return new UploadExcelFilesModel(isSuccessful);
+        if (files == null || files.Count == 0) return new UploadExcelFilesModel(loadSuccessful: false);
 
-        var pathToDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache", Guid.NewGuid().ToString().Split('-')[^1]);
+        var pathToDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache",DateTime.Now.ToString("dd-MM-yy-") + Guid.NewGuid().ToString().Split('-')[0]);
         Directory.CreateDirectory(pathToDir);
 
         foreach (var file in files)
@@ -40,10 +53,15 @@ public class UploadExcelFilesModel
         if (Directory.GetFiles(pathToDir).Length == 0)
         {
             Directory.Delete(pathToDir);
-            return new UploadExcelFilesModel(isSuccessful);
+            return new UploadExcelFilesModel(loadSuccessful: false);
         }
 
-        isSuccessful = true;
-        return new UploadExcelFilesModel(isSuccessful, pathToDir);
+        return new UploadExcelFilesModel(loadSuccessful: true, pathToDir, db);
+    }
+
+    private void AddToDb(IEnumerable<RPD> rpds)
+    {
+        _db.AddRange(rpds);
+        _db.SaveChanges();
     }
 }

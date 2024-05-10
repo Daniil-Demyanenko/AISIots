@@ -1,4 +1,4 @@
-using AISIots.Models;
+using AISIots.Models.DbTables;
 using Microsoft.EntityFrameworkCore;
 
 namespace AISIots.DAL;

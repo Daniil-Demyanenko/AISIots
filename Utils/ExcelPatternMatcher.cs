@@ -2,7 +2,7 @@ using ClosedXML.Excel;
 
 namespace AISIots.Utils;
 
-public record ExcelPatternMatchingResult(ExcelFileType Type, int PagePosition);
+public record ExcelPatternMatchingResult(ExcelFileType Type, int WorksheetPosition);
 
 public static class ExcelPatternMatcher
 {
