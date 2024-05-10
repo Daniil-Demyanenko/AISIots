@@ -8,7 +8,7 @@
    
     @using (Html.BeginForm("UploadFiles", "Main", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
-        <input type="file" name="files" multiple accept=".xls, .xlsx"/>
+        <input type="file" name="files" multiple accept=".xlsx"/>
         <input type="submit" value="Загрузить файлы"/>
     }
     
