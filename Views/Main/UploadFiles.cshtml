@@ -1,4 +1,4 @@
-@model ExcelFilesModel
+@model UploadExcelFilesModel
 
 @{
     ViewData["Title"] = "Загруженные файлы";
@@ -7,9 +7,9 @@
 {
     <h1>Успешно!</h1>
     <ul>
-        @foreach (var file in Model.GetFileNames())
+        @foreach (var file in Model.Files)
         {
-            <li>@file</li>
+            <li>@file.Type - @file.Name</li>
         }
     </ul>
 }

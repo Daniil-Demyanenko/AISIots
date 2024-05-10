@@ -17,7 +17,7 @@ public class MainController : Controller
     [HttpPost("UploadFiles")]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)
     {
-        var excelFiles = await ExcelFilesModel.Create(files);
+        var excelFiles = await UploadExcelFilesModel.Create(files);
 
         return View(excelFiles);
     }
