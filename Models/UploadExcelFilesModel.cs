@@ -7,36 +7,19 @@ namespace AISIots.Models;
 public class UploadExcelFilesModel
 {
     public bool LoadSuccessful { get; private set; }
-    private readonly string? PathToDir;
     public IEnumerable<(ExcelPatternMatchingResult Info, string Path)>? Files;
-    private SqliteContext? _db;
 
-    private UploadExcelFilesModel(bool loadSuccessful, string? pathToDir = null, SqliteContext? db = null)
+    private UploadExcelFilesModel(bool loadSuccessful, IEnumerable<(ExcelPatternMatchingResult Info, string Path)>? files = null)
     {
         LoadSuccessful = loadSuccessful;
-        PathToDir = pathToDir;
-        _db = db;
-
-        if (!LoadSuccessful) return;
-        
-        Files = Directory.GetFiles(PathToDir!).Select(x =>
-            (ExcelPatternMatcher.GetTemplateType(x), x));
-
-        List<RPD> rpds = new();
-        foreach (var f in Files.Where(x=> x.Info.Type == ExcelFileType.RPD))
-        {
-            using RPDParser parser = new(f.Info, f.Path);
-            rpds.Add(parser.Parse());
-        }
-        
-        AddToDb(rpds);
+        Files = files;
     }
 
     public static async Task<UploadExcelFilesModel> Create(List<IFormFile>? files, SqliteContext db)
     {
         if (files == null || files.Count == 0) return new UploadExcelFilesModel(loadSuccessful: false);
 
-        var pathToDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache",DateTime.Now.ToString("dd-MM-yy-") + Guid.NewGuid().ToString().Split('-')[0]);
+        var pathToDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache", DateTime.Now.ToString("dd-MM-yy-") + Guid.NewGuid().ToString().Split('-')[0]);
         Directory.CreateDirectory(pathToDir);
 
         foreach (var file in files)
@@ -50,18 +33,34 @@ public class UploadExcelFilesModel
             await file.CopyToAsync(stream);
         }
 
-        if (Directory.GetFiles(pathToDir).Length == 0)
-        {
-            Directory.Delete(pathToDir);
-            return new UploadExcelFilesModel(loadSuccessful: false);
-        }
+        await TryParseFilesToDb(pathToDir, db);
 
-        return new UploadExcelFilesModel(loadSuccessful: true, pathToDir, db);
+        return new UploadExcelFilesModel(loadSuccessful: true);
     }
 
-    private void AddToDb(IEnumerable<RPD> rpds)
+    private static async Task<bool> TryParseFilesToDb(string pathToDir, SqliteContext db)
     {
-        _db.AddRange(rpds);
-        _db.SaveChanges();
+        var fileWithTypes = Directory.GetFiles(pathToDir).Select(path =>
+            (info : ExcelPatternMatcher.GetTemplateType(path), path : path));
+
+        List<RPD> rpds = new();
+        List<Plan> plans = new();
+        foreach (var f in fileWithTypes)
+        {
+            if (f.info.Type == ExcelFileType.RPD)
+            {
+                using var parser = new RPDParser(f.info, f.path);
+                rpds.Add(parser.Parse());
+            }
+            if (f.info.Type == ExcelFileType.Plan)
+            {
+                using var parser = new PlanParser(f.info, f.path);
+                plans.Add(parser.Parse());
+            }
+        }
+
+        await db.RPD.AddRangeAsync(rpds);
+        await db.Plans.AddRangeAsync(plans);
+        return true;
     }
 }
