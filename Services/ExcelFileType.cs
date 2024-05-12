@@ -1,8 +1,8 @@
-namespace AISIots.Utils;
+namespace AISIots.Services;
 
 public enum ExcelFileType
 {
-    RPD,
+    Rpd,
     Plan,
     Undefined
 }

@@ -3,11 +3,10 @@ using AISIots.Models;
 using AISIots.Models.DbTables;
 using ClosedXML.Excel;
 
-namespace AISIots.Utils;
+namespace AISIots.Services;
 
 public class PlanParser : IDisposable
 {
-    private readonly string _path;
     private readonly XLWorkbook _wb;
     private readonly IXLWorksheet _wsTitle;
     private readonly IXLWorksheet _wsPlan;
@@ -16,7 +15,6 @@ public class PlanParser : IDisposable
     {
         if (info.Type != ExcelFileType.Plan) throw new Exception("this is not a Plan");
         _wb = new XLWorkbook(path);
-        _path = path;
 
         var (planPage, titlePage) = ExcelPatternMatcher.GetImportantPlanPages(path);
         if (planPage == -1 || titlePage == -1) throw new Exception("Important page not found");
@@ -54,7 +52,7 @@ public class PlanParser : IDisposable
                 if (!cell.IsMerged()) continue; // в ячейке хранится дисциплина
                 if (cellValue.Contains("Блок ")) break; // начался следующий блок
 
-                planBloks.Last().SupBlocks.Add(new PlanBlock(cellValue));
+                planBloks.Last().BlockSections.Add(new BlockSection(cellValue));
 
                 for (int itemRow = sectionRow + 1; itemRow < lastRow; itemRow++) // создание записей в каждой секции
                 {
@@ -63,9 +61,8 @@ public class PlanParser : IDisposable
 
                     var index = _wsPlan.Cell(sectionRow, 2).Value.ToString().Trim();
                     var discipline = _wsPlan.Cell(sectionRow, 3).Value.ToString().Trim();
-                    var title = index + " " + discipline;
                     
-                    planBloks.Last().SupBlocks.Last().SupBlocks.Add(new PlanBlock(title));
+                    planBloks.Last().BlockSections.Last().ShortRpds.Add(new ShortRpd(discipline, index));
                 }
             }
         }

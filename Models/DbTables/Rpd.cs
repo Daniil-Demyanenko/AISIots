@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AISIots.Models.DbTables;
 
-public class RPD
+public class Rpd
 {
     [Key] public int Id { get; set; }
     public string Title { get; set; }
@@ -31,7 +31,7 @@ public class RPD
     public List<string> Fos { get; set; } = [];
     public List<string> FosItog { get; set; } = [];
 
-    public RPD()
+    public Rpd()
     {
         SetFormatedDateTime(DateTime.Now);
     }

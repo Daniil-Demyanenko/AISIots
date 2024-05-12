@@ -1,6 +1,5 @@
 using AISIots.DAL;
-using AISIots.Models.DbTables;
-using AISIots.Utils;
+using AISIots.Services;
 
 namespace AISIots.Models;
 
@@ -33,34 +32,10 @@ public class UploadExcelFilesModel
             await file.CopyToAsync(stream);
         }
 
-        await TryParseFilesToDb(pathToDir, db);
+        await FilesDbUpdater.TryParseFilesFromDirectoryToDb(pathToDir, db);
 
         return new UploadExcelFilesModel(loadSuccessful: true);
     }
 
-    private static async Task<bool> TryParseFilesToDb(string pathToDir, SqliteContext db)
-    {
-        var fileWithTypes = Directory.GetFiles(pathToDir).Select(path =>
-            (info : ExcelPatternMatcher.GetTemplateType(path), path : path));
-
-        List<RPD> rpds = new();
-        List<Plan> plans = new();
-        foreach (var f in fileWithTypes)
-        {
-            if (f.info.Type == ExcelFileType.RPD)
-            {
-                using var parser = new RPDParser(f.info, f.path);
-                rpds.Add(parser.Parse());
-            }
-            if (f.info.Type == ExcelFileType.Plan)
-            {
-                using var parser = new PlanParser(f.info, f.path);
-                plans.Add(parser.Parse());
-            }
-        }
-
-        await db.RPD.AddRangeAsync(rpds);
-        await db.Plans.AddRangeAsync(plans);
-        return true;
-    }
+    
 }

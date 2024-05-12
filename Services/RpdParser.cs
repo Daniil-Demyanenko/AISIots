@@ -1,29 +1,28 @@
 using AISIots.Models.DbTables;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace AISIots.Utils;
+namespace AISIots.Services;
 
-public class RPDParser : IDisposable
+public class RpdParser : IDisposable
 {
     private readonly string _path;
     private readonly XLWorkbook? _wb;
     private readonly IXLWorksheet _ws;
 
-    public RPDParser(ExcelPatternMatchingResult info, string path)
+    public RpdParser(ExcelPatternMatchingResult info, string path)
     {
-        if (info.Type != ExcelFileType.RPD) throw new Exception("this is not a RPD");
+        if (info.Type != ExcelFileType.Rpd) throw new Exception("this is not a RPD");
         if (info.WorksheetPosition == -1) throw new Exception("Important page not found");
         _wb = new XLWorkbook(path);
         _ws = _wb.Worksheet(info.WorksheetPosition);
         _path = path;
     }
 
-    public RPD Parse()
+    public Rpd Parse()
     {
         var fieldsInFile = ReadAsDictionary();
 
-        return FillRPD(fieldsInFile);
+        return FillRpd(fieldsInFile);
     }
 
     private Dictionary<string, string> ReadAsDictionary()
@@ -47,9 +46,9 @@ public class RPDParser : IDisposable
         return result;
     }
 
-    private RPD FillRPD(Dictionary<string, string> fields)
+    private Rpd FillRpd(Dictionary<string, string> fields)
     {
-        var rpd = new RPD();
+        var rpd = new Rpd();
         foreach (var key in fields.Keys)
         {
             if (key.Contains("fos") && key.Length <= 6) rpd.Fos.Add(fields[key]);

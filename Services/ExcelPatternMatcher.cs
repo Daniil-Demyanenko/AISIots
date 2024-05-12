@@ -1,6 +1,6 @@
 using ClosedXML.Excel;
 
-namespace AISIots.Utils;
+namespace AISIots.Services;
 
 public record ExcelPatternMatchingResult(ExcelFileType Type, int WorksheetPosition);
 
@@ -11,7 +11,7 @@ public static class ExcelPatternMatcher
         using var workbook = new XLWorkbook(path);
 
         var rpdPage = IndexOfPageWithRPD(workbook);
-        if (rpdPage != -1) return new ExcelPatternMatchingResult(ExcelFileType.RPD, rpdPage);
+        if (rpdPage != -1) return new ExcelPatternMatchingResult(ExcelFileType.Rpd, rpdPage);
 
         var planPage = IndexOfPageWithPlan(workbook);
         if (planPage != -1) return new ExcelPatternMatchingResult(ExcelFileType.Plan, planPage);
