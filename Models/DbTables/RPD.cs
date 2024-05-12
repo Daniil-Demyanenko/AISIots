@@ -5,7 +5,6 @@ namespace AISIots.Models.DbTables;
 public class RPD
 {
     [Key] public int Id { get; set; }
-    public Plan? PlanId { get; set; }
     public string Title { get; set; }
     public string UpdateDateTime { get; set; }
     public string? DisciplineIndex { get; set; }
@@ -32,14 +31,18 @@ public class RPD
     public List<string> Fos { get; set; } = [];
     public List<string> FosItog { get; set; } = [];
 
-
+    public RPD()
+    {
+        SetFormatedDateTime(DateTime.Now);
+    }
+    
     /// <summary>
     /// Устанавливает время последнего обновления программы дисциплины
     /// </summary>
     /// <param name="dt"></param>
     public void SetFormatedDateTime(DateTime dt)
     {
-        UpdateDateTime = dt.ToString("dd/MM/yyyy-HH:mm");
+        UpdateDateTime = dt.ToString("dd.MM.yyyy-HH:mm");
     }
 }
 
