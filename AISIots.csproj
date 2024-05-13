@@ -8,7 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="FuzzySharp" Version="2.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.4" />
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Home\Privacy.cshtml" />
   </ItemGroup>
 
 </Project>

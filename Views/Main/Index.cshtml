@@ -1,15 +1,32 @@
-﻿@{
+﻿@using DocumentFormat.OpenXml.Office2010.Excel
+@model SearchModel
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-   
+
     @using (Html.BeginForm("UploadFiles", "Main", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
-        <input type="file" name="files" multiple accept=".xlsx"/>
+        <input type="file" name="files" value="Выбрать файлы" multiple accept=".xlsx"/>
         <input type="submit" value="Загрузить файлы"/>
     }
-    
+
+    @using (Html.BeginForm("Index", "Main", FormMethod.Get))
+    {
+        <input type="text" name="searchString" class="form-control" placeholder="Поиск файла...">
+        <button type="submit" value="Поиск" class="btn btn-primary">Поиск</button>
+        <label>@Html.RadioButton("isRpdSearch", true)РПД</label>
+        <label>@Html.RadioButton("isRpdSearch", false)План</label>
+    }
+
+    <ul style="text-align: left">
+        @foreach (var i in Model.Items)
+        {
+            <li>@i.Id -- @i.Title</li>
+        }
+    </ul>
+
 </div>

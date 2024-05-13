@@ -3,7 +3,7 @@ using AISIots.Models.DbTables;
 
 namespace AISIots.Services;
 
-public static class FilesDbUpdater
+public static class FilesDbLoader
 {
     public static async Task<(bool status, IEnumerable<string> problemFiles, IEnumerable<string> successFiles)> TryParseFilesFromDirectoryToDb(string pathToDir,
         SqliteContext db)

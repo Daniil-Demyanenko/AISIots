@@ -34,7 +34,7 @@ public class UploadExcelFilesModel
             await file.CopyToAsync(stream);
         }
 
-        var (parseSuccess, problemFiles, successFiles) = await FilesDbUpdater.TryParseFilesFromDirectoryToDb(pathToDir, db);
+        var (parseSuccess, problemFiles, successFiles) = await FilesDbLoader.TryParseFilesFromDirectoryToDb(pathToDir, db);
         if (!parseSuccess)
             return new UploadExcelFilesModel(loadSuccessful: false, successFiles, problemFiles);
 

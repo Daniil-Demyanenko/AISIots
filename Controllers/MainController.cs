@@ -1,23 +1,28 @@
 using System.Diagnostics;
 using AISIots.DAL;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using AISIots.Models;
+using AISIots.Services;
 
 
 namespace AISIots.Controllers;
 
 public class MainController(SqliteContext _db) : Controller
 {
-    public IActionResult Index()
+    public async Task<IActionResult> Index(string? searchString = null, bool isRpdSearch = true)
     {
-        return View();
-    }
-    
-    [HttpPost]
-    public IActionResult Search(string? fileTitle)
-    {
+        var searcher = new FuzzyService(_db);
         
+        if (string.IsNullOrEmpty(searchString))
+            return View(searcher.GetNewestRpds());
+        
+        return View(searcher.GetFuzzySorted(searchString,isRpdSearch));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Search()
+    {
+        await Task.Delay(10);
         return View();
     }
 

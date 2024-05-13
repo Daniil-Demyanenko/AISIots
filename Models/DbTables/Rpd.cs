@@ -6,7 +6,7 @@ public class Rpd
 {
     [Key] public int Id { get; set; }
     public string Title { get; set; }
-    public string UpdateDateTime { get; set; }
+    public DateTime UpdateDateTime { get; set; }
     public string? DisciplineIndex { get; set; }
     public string? PrepodRegFull { get; set; }
     public string? PrepodRegFullShort { get; set; }
@@ -33,16 +33,11 @@ public class Rpd
 
     public Rpd()
     {
-        SetFormatedDateTime(DateTime.Now);
+        UpdateDateTime = DateTime.Now;
     }
     
-    /// <summary>
-    /// Устанавливает время последнего обновления программы дисциплины
-    /// </summary>
-    /// <param name="dt"></param>
-    public void SetFormatedDateTime(DateTime dt)
+    public string GetFormatedDateTime()
     {
-        UpdateDateTime = dt.ToString("dd.MM.yyyy-HH:mm");
+        return UpdateDateTime.ToString("dd.MM.yyyy-HH:mm");
     }
 }
-
