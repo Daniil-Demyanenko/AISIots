@@ -6,6 +6,7 @@ public class Plan
 {
     [Key]
     public int Id { get; set; }
+    public List<PlanBlock> PlanBlocks { get; set; }
     /// <summary>
     /// Год набора группы
     /// </summary>
@@ -21,7 +22,6 @@ public class Plan
     /// Магистратура, бакалавриат, аспирантура...
     /// </summary>
     public string Level { get; set; }
-    public List<PlanBlock> PlanBlocks { get; set; }
 
     public Plan()
     {

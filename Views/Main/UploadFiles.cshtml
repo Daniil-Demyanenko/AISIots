@@ -1,21 +1,32 @@
-@using AISIots.Services
 @model UploadExcelFilesModel
 
 @{
     ViewData["Title"] = "Загруженные файлы";
 }
-@if (Model.LoadSuccessful)
+@if (!Model.SuccessFiles.Any())
+{
+    <h1>Не загружено ни одного файла!</h1>
+    <p>Вероятно, ошибка при разборе типов файлов или файлы не были загружены.</p>
+}
+
+@if (Model.SuccessFiles.Any())
 {
     <h1>Успешно загружено следующие файлы:</h1>
     <ul>
-        @foreach (var file in Model.Files!.Where(x=>x.Info.Type != ExcelFileType.Undefined))
+        @foreach (var file in Model.SuccessFiles)
         {
-            <li>@file.Info.Type - @System.IO.Path.GetFileName(file.Path)</li>
+            <li>@file</li>
         }
     </ul>
 }
 
-@if (!Model.LoadSuccessful)
+@if (Model.ProblemFiles.Any())
 {
-    <h1>Невыявлено подходящих для обработки файлов</h1>
+    <h1>Проблемные файлы:</h1>
+    <ul>
+        @foreach (var file in Model.ProblemFiles)
+        {
+            <li>@file</li>
+        }
+    </ul>
 }

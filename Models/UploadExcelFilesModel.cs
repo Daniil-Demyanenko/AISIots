@@ -6,17 +6,19 @@ namespace AISIots.Models;
 public class UploadExcelFilesModel
 {
     public bool LoadSuccessful { get; private set; }
-    public IEnumerable<(ExcelPatternMatchingResult Info, string Path)>? Files;
+    public IEnumerable<string> SuccessFiles;
+    public IEnumerable<string> ProblemFiles;
 
-    private UploadExcelFilesModel(bool loadSuccessful, IEnumerable<(ExcelPatternMatchingResult Info, string Path)>? files = null)
+    private UploadExcelFilesModel(bool loadSuccessful, IEnumerable<string> successFiles, IEnumerable<string> problemFiles)
     {
         LoadSuccessful = loadSuccessful;
-        Files = files;
+        ProblemFiles = problemFiles;
+        SuccessFiles = successFiles;
     }
 
     public static async Task<UploadExcelFilesModel> Create(List<IFormFile>? files, SqliteContext db)
     {
-        if (files == null || files.Count == 0) return new UploadExcelFilesModel(loadSuccessful: false);
+        if (files == null || files.Count == 0) return new UploadExcelFilesModel(loadSuccessful: false, [],[]);
 
         var pathToDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache", DateTime.Now.ToString("dd-MM-yy-") + Guid.NewGuid().ToString().Split('-')[0]);
         Directory.CreateDirectory(pathToDir);
@@ -32,10 +34,10 @@ public class UploadExcelFilesModel
             await file.CopyToAsync(stream);
         }
 
-        await FilesDbUpdater.TryParseFilesFromDirectoryToDb(pathToDir, db);
+        var (parseSuccess, problemFiles, successFiles) = await FilesDbUpdater.TryParseFilesFromDirectoryToDb(pathToDir, db);
+        if (!parseSuccess)
+            return new UploadExcelFilesModel(loadSuccessful: false, successFiles, problemFiles);
 
-        return new UploadExcelFilesModel(loadSuccessful: true);
+        return new UploadExcelFilesModel(loadSuccessful: true, successFiles, problemFiles);
     }
-
-    
 }
