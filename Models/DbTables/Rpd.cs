@@ -7,7 +7,6 @@ public class Rpd
     [Key] public int Id { get; set; }
     public string Title { get; set; }
     public DateTime UpdateDateTime { get; set; }
-    public string? DisciplineIndex { get; set; }
     public string? PrepodRegFull { get; set; }
     public string? PrepodRegFullShort { get; set; }
     public string? Razrab { get; set; }
@@ -35,7 +34,7 @@ public class Rpd
     {
         UpdateDateTime = DateTime.Now;
     }
-    
+
     public string GetFormatedDateTime()
     {
         return UpdateDateTime.ToString("dd.MM.yyyy-HH:mm");

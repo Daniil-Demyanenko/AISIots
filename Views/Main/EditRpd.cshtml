@@ -1,0 +1,119 @@
+@using Microsoft.AspNetCore.Mvc.ModelBinding
+@model AISIots.Models.DbTables.Rpd
+
+@{
+    ViewData["Title"] = "Редактировать РПД";
+}
+
+<p>Дата последнего редактирования: @Model.GetFormatedDateTime()</p>
+
+<form asp-action="CheckSave" asp-controller="Main" method="post">
+    <!-- Поля ввода для обычных свойств модели Rpd -->
+    <div class="form-group">
+        <label asp-for="Title">Название:</label>
+        <input asp-for="Title" value="@Model.Title" class="form-control"/>
+        <span asp-validation-for="Title" class="text-danger"></span>
+
+        <label asp-for="PrepodRegFull">Регалии преподавателя:</label>
+        <input asp-for="PrepodRegFull" value="@Model.PrepodRegFull" class="form-control"/>
+
+        <label asp-for="PrepodRegFullShort">Регалии преподавателя (коротко):</label>
+        <input asp-for="PrepodRegFullShort" value="@Model.PrepodRegFullShort" class="form-control"/>
+
+        <label asp-for="Razrab">Разработчик:</label>
+        <input asp-for="Razrab" value="@Model.Razrab" class="form-control"/>
+
+        <label asp-for="RazrabShort">Разработчик (коротко):</label>
+        <input asp-for="RazrabShort" value="@Model.RazrabShort" class="form-control"/>
+
+        <label asp-for="Tceli">Цели:</label>
+        <textarea asp-for="Tceli" class="form-control">@Model.Tceli</textarea>
+
+        <label asp-for="Znat">Знать:</label>
+        <input asp-for="Znat" value="@Model.Znat" class="form-control"/>
+
+        <label asp-for="Umet">Уметь:</label>
+        <input asp-for="Umet" value="@Model.Umet" class="form-control"/>
+
+        <label asp-for="Vladet">Владеть:</label>
+        <input asp-for="Vladet" value="@Model.Vladet" class="form-control"/>
+
+        <label asp-for="DopProgObesp">Дополнительное программное обеспечение:</label>
+        <input asp-for="DopProgObesp" value="@Model.DopProgObesp" class="form-control"/>
+
+        <label asp-for="Osnna">Osnna:</label>
+        <input asp-for="Osnna" value="@Model.Osnna" class="form-control"/>
+
+        <label asp-for="Sldla">Sldla:</label>
+        <input asp-for="Sldla" value="@Model.Sldla" class="form-control"/>
+    </div>
+    <!-- Поля ввода для списков строк -->
+    <h4>Задания:</h4>
+    @foreach (var i in Model.Zad)
+    {
+        <textarea name="Zad" class="form-control">@i</textarea>
+    }
+
+    <h4>Лекции</h4>
+    @foreach (var i in Model.Nlec)
+    {
+        <textarea name="Nlec" class="form-control">@i</textarea>
+    }
+
+    <h4>Практические</h4>
+    @foreach (var i in Model.Npract)
+    {
+        <textarea name="Npract" class="form-control">@i</textarea>
+    }
+
+    <h4>Лабораторные</h4>
+    @foreach (var i in Model.Nlab)
+    {
+        <textarea name="Nlab" class="form-control">@i</textarea>
+    }
+
+    <h4>Самостоятельные</h4>
+    @foreach (var i in Model.Nsr)
+    {
+        <textarea name="Nsr" class="form-control">@i</textarea>
+    }
+
+    <h4>Курсовые</h4>
+    @foreach (var i in Model.KursRab)
+    {
+    <textarea name="KursRab" class="form-control">@i</textarea>
+    }
+
+    <h4>Основная литература</h4>
+    @foreach (var i in Model.OsnLitra)
+    {
+    <textarea name="OsnLitra" class="form-control">@i</textarea>
+    }
+
+    <h4>Дополнительная литература</h4>
+    @foreach (var i in Model.DopLitra)
+    {
+    <textarea name="LecAnnotir" class="form-control">@i</textarea>
+    }
+
+    <h4>Аннотированные лекции</h4>
+    @foreach (var i in Model.LecAnnotir)
+    {
+    <textarea name="Nsr" class="form-control">@i</textarea>
+    }
+
+    <h4>ФОС</h4>
+    @foreach (var i in Model.Fos)
+    {
+    <textarea name="Fos" class="form-control">@i</textarea>
+    }
+
+    <h4>ФОС итог</h4>
+    @foreach (var i in Model.FosItog)
+    {
+    <textarea name="FosItog" class="form-control">@i</textarea>
+    }
+
+    <input type="hidden" name="Id" value="@Model.Id">
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>

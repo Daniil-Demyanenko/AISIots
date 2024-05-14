@@ -20,7 +20,7 @@ public class FuzzyService(SqliteContext db)
             ? db.Rpds!.Select(x => new SearchItem(x.Id, x.Title))
             : db.Plans!.Select(x => new SearchItem(x.Id, x.Profile + " - " + x.Code));
 
-        var items = select.AsEnumerable().OrderByDescending(x => Fuzz.TokenSortRatio(searchString.ToLower(), x.Title.ToLower())).Take(20);
+        var items = select.AsEnumerable().OrderByDescending(x => Fuzz.TokenSortRatio(searchString.ToLower(), x.Title.ToLower())).Take(50);
 
         return new SearchModel(items, isRpdSearch);
     }

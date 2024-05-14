@@ -2,6 +2,7 @@ using System.Diagnostics;
 using AISIots.DAL;
 using Microsoft.AspNetCore.Mvc;
 using AISIots.Models;
+using AISIots.Models.DbTables;
 using AISIots.Services;
 
 
@@ -9,22 +10,45 @@ namespace AISIots.Controllers;
 
 public class MainController(SqliteContext _db) : Controller
 {
-    public async Task<IActionResult> Index(string? searchString = null, bool isRpdSearch = true)
+    public IActionResult Index(string? searchString = null, bool isRpdSearch = true)
     {
-        var searcher = new FuzzyService(_db);
-        
-        if (string.IsNullOrEmpty(searchString))
-            return View(searcher.GetNewestRpds());
-        
-        return View(searcher.GetFuzzySorted(searchString,isRpdSearch));
+        return View(SearchModel.Create(_db, searchString, isRpdSearch));
+    }
+
+    public async Task<IActionResult> EditRpd(int? id = null)
+    {
+        var rpd = await RpdFinder.FindOrCreateById(id, _db);
+        return View(rpd);
+    }
+    
+    public async Task<IActionResult> ViewPlan(int id)
+    {
+        var plan = await _db.Plans.FindAsync(id);
+        return View(plan);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Search()
+    public IActionResult CheckSave(Rpd rpd)
     {
-        await Task.Delay(10);
-        return View();
+        if (string.IsNullOrEmpty(rpd.Title?.Trim()))
+        {
+            ModelState.Remove("Title"); // Костыль, чтоб убрать сообщение по умолчанию
+            ModelState.AddModelError("Title", "Поле обязательно для заполнения");
+        }
+        else if (RpdFinder.IsContainSameTitleDifferentId(rpd.Title, rpd.Id, _db))
+            ModelState.AddModelError("Title", "Такая РПД уже существует");
+
+        if (ModelState.IsValid)
+        {
+            rpd.UpdateDateTime = DateTime.Now;
+            _db.Rpds.Update(rpd);
+            _db.SaveChanges();
+            return View("Index", SearchModel.Create(_db, rpd.Title, isRpdSearch: true));
+        }
+
+        return View("EditRpd", rpd);
     }
+
 
     [HttpPost("UploadFiles")]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)
@@ -33,6 +57,7 @@ public class MainController(SqliteContext _db) : Controller
 
         return View(excelFiles);
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
