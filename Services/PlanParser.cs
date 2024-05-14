@@ -56,11 +56,11 @@ public class PlanParser : IDisposable
 
                 for (int itemRow = sectionRow + 1; itemRow < lastRow; itemRow++) // создание записей в каждой секции
                 {
-                    cell = _wsPlan.Cell(sectionRow, 1);
+                    cell = _wsPlan.Cell(itemRow, 1);
                     if (cell.IsMerged()) break;
 
-                    var index = _wsPlan.Cell(sectionRow, 2).Value.ToString().Trim();
-                    var discipline = _wsPlan.Cell(sectionRow, 3).Value.ToString().Trim();
+                    var index = _wsPlan.Cell(itemRow, 2).Value.ToString().Trim();
+                    var discipline = _wsPlan.Cell(itemRow, 3).Value.ToString().Trim();
                     
                     planBloks.Last().BlockSections.Last().ShortRpds.Add(new ShortRpd(discipline, index));
                 }
@@ -122,7 +122,7 @@ public class PlanParser : IDisposable
         }
 
         // Поиск кода направления обучения
-        string pattern = @"^\s*\d{1,2}\.\d{1,2}\.\d{1,2}\s+[А-Яа-яA-Za-z\s]+$";
+        string pattern = @"^\s*\d{1,2}\.\d{1,2}\.\d{1,2}\s+[А-Яа-яA-Za-z\(\)\s]+$";
         Regex regex = new Regex(pattern);
         int lastCol = _wsTitle.LastColumnUsed().ColumnNumber();
         foreach (var row in visibleRows)
