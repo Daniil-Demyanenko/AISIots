@@ -1,0 +1,48 @@
+@using AISIots.Models.DbTables
+@model AISIots.Models.DbTables.Plan?
+
+@{
+    ViewData["Title"] = "Просмотр учебного плана";
+}
+
+@if (Model is null)
+{
+    <h1 class="text-danger">План не найден</h1>
+}
+
+<h1>@Model?.Code - @Model?.Profile (@Model?.GroupYear)</h1>
+<p>Дата последнего редактирования: @Model?.GetFormatedDateTime()</p>
+
+<p>Форма обучения: @Model?.LearningForm, @Model?.Level</p>
+<p>Продолжительность: @Model?.LearningDuration </p>
+
+<p>Институт: @Model?.Institute</p>
+<p>Кафедра: @Model?.Kafedra</p>
+
+<h3>В план входят дисциплины:</h3>
+<ul>
+    @foreach (var block in @Model?.PlanBlocks!)
+    {
+        <li>
+            <b>@block.Title</b>
+        </li>
+        <li>
+            <ul>
+                @foreach (var supBlock in @block.BlockSections)
+                {
+                    <li>
+                        <b>@supBlock.Title</b>
+                    </li>
+                    <ul>
+                        @foreach (var shortRpd in @supBlock.ShortRpds)
+                        {
+                            <li>
+                                @shortRpd.Index - @shortRpd.Discipline
+                            </li>
+                        }
+                    </ul>
+                }
+            </ul>
+        </li>
+    }
+</ul>

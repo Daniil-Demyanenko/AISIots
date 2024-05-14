@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using AISIots.Models;
 using AISIots.Models.DbTables;
 using AISIots.Services;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace AISIots.Controllers;
@@ -23,7 +24,11 @@ public class MainController(SqliteContext _db) : Controller
     
     public async Task<IActionResult> ViewPlan(int id)
     {
-        var plan = await _db.Plans.FindAsync(id);
+        var plan = _db.Plans
+            .Include(p => p.PlanBlocks)
+            .ThenInclude(pb => pb.BlockSections)
+            .ThenInclude(bs => bs.ShortRpds)
+            .FirstOrDefault(p => p.Id == id);
         return View(plan);
     }
 

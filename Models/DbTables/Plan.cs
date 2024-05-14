@@ -11,7 +11,7 @@ public class Plan
     /// Год набора группы
     /// </summary>
     public int? GroupYear { get; set; }
-    public string UpdateDateTime { get; set; }
+    public DateTime UpdateDateTime { get; set; }
     public string Profile { get; set; }
     public string? Kafedra { get; set; }
     public string? Institute { get; set; }
@@ -25,14 +25,11 @@ public class Plan
 
     public Plan()
     {
-        SetFormatedDateTime(DateTime.Now);
+        UpdateDateTime = DateTime.Now;
     }
     
-    /// <summary>
-    /// Устанавливает время последнего обновления плана
-    /// </summary>
-    public void SetFormatedDateTime(DateTime dt)
+    public string GetFormatedDateTime()
     {
-        UpdateDateTime = dt.ToString("dd.MM.yyyy-HH:mm");
+        return UpdateDateTime.ToString("dd.MM.yyyy-HH:mm");
     }
 }

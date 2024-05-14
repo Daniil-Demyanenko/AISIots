@@ -1,6 +1,5 @@
 using AISIots.Models.DbTables;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AISIots.DAL;
 

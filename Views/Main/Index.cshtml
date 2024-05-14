@@ -26,7 +26,7 @@
     @foreach (var i in Model.Items)
     {
         <li>
-            <a asp-controller="Main" asp-action="EditRpd" asp-route-id="@i.Id">@i.Title</a>
+            <a asp-controller="Main" asp-action="@(@Model.IsRpdSearch ? "EditRpd" : "ViewPlan")" asp-route-id="@i.Id">@i.Title</a>
         </li>
     }
 </ul>
