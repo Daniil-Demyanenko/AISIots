@@ -27,7 +27,7 @@ public static class FilesDbLoader
                         using var parser = new RpdParser(f.info, f.path);
                         var rpd = parser.Parse();
                         if (DbFinder.IsContainRpdWithTitle(rpd.Title, db))
-                            problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} -- дубликат");
+                            problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} - [дубликат]");
                         else
                         {
                             rpds.Add(rpd);
@@ -40,7 +40,7 @@ public static class FilesDbLoader
                         using var parser = new PlanParser(f.info, f.path);
                         var plan = parser.Parse();
                         if (DbFinder.IsContainLogicalSamePlan(plan, db))
-                            problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} -- дубликат");
+                            problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} - [дубликат]");
                         else
                         {
                             plans.Add(plan);
@@ -48,11 +48,11 @@ public static class FilesDbLoader
                         }
                     }
 
-                    if (f.info.Type == ExcelFileType.Undefined) problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} -- нераспознан тип файла");
+                    if (f.info.Type == ExcelFileType.Undefined) problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} - [нераспознан тип файла]");
                 }
                 catch (Exception e)
                 {
-                    problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} -- не удалось получить информацию");
+                    problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} - [не удалось получить информацию]");
                 }
             }
 
