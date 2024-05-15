@@ -6,23 +6,26 @@ namespace AISIots.Services;
 
 public static class DbFinder
 {
-    public static async Task<Rpd> FindOrCreateById(int? id, SqliteContext db)
+    public static async Task<Rpd> FindOrCreateRpdById(int? id, SqliteContext db)
     {
         var rpd = await db.Rpds.FindAsync(id);
         if (rpd is null)
         {
             rpd = (await db.Rpds.AddAsync(new Rpd())).Entity;
         }
-    
+
         return Normalize(rpd);
     }
+
+    public static bool IsContainLogicalSamePlan(Plan plan, SqliteContext db)
+        => db.Plans.Any(x => x.Profile == plan.Profile && x.GroupYear == plan.GroupYear && x.Level == plan.Level &&
+                             x.LearningForm == plan.LearningForm && x.Institute == plan.Institute);
 
     public static bool IsContainRpdWithTitle(string title, SqliteContext db)
         => db.Rpds.Any(x => x.Title == title);
 
-    public static bool IsContainSameTitleDifferentId(string title, int id, SqliteContext db)
+    public static bool IsContainRpdWithSameTitleDifferentId(string title, int id, SqliteContext db)
         => db.Rpds.Any(x => x.Title == title && x.Id != id);
-
 
     private static Rpd Normalize(Rpd rpd)
     {

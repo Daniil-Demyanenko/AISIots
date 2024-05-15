@@ -35,11 +35,17 @@ public static class FilesDbLoader
                         }
                     }
 
-                    if (f.info.Type == ExcelFileType.Plan) // TODO: Проверка на дубликаты
+                    if (f.info.Type == ExcelFileType.Plan)
                     {
                         using var parser = new PlanParser(f.info, f.path);
-                        plans.Add(parser.Parse());
-                        successFiles.Add(Path.GetFileNameWithoutExtension(f.path));
+                        var plan = parser.Parse();
+                        if (DbFinder.IsContainLogicalSamePlan(plan, db))
+                            problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} -- дубликат");
+                        else
+                        {
+                            plans.Add(plan);
+                            successFiles.Add(Path.GetFileNameWithoutExtension(f.path));
+                        }
                     }
 
                     if (f.info.Type == ExcelFileType.Undefined) problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} -- нераспознан тип файла");
