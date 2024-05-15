@@ -16,12 +16,17 @@ public class MainController(SqliteContext _db) : Controller
         return View(SearchModel.Create(_db, searchString, isRpdSearch));
     }
 
+    public IActionResult ImportExport()
+    {
+        return View(new ExportJsonModel(_db));
+    }
+
     public async Task<IActionResult> EditRpd(int? id = null)
     {
         var rpd = await DbFinder.FindOrCreateRpdById(id, _db);
         return View(rpd);
     }
-    
+
     public IActionResult ViewPlan(int id)
     {
         var plan = _db.Plans
@@ -62,10 +67,9 @@ public class MainController(SqliteContext _db) : Controller
 
         return View(excelFiles);
     }
-    
+
     public IActionResult MissingReport()
     {
-        
         return View(new MissingReportModel(_db));
     }
 
