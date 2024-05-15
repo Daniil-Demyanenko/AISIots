@@ -18,11 +18,11 @@ public class MainController(SqliteContext _db) : Controller
 
     public async Task<IActionResult> EditRpd(int? id = null)
     {
-        var rpd = await RpdFinder.FindOrCreateById(id, _db);
+        var rpd = await DbFinder.FindOrCreateById(id, _db);
         return View(rpd);
     }
     
-    public async Task<IActionResult> ViewPlan(int id)
+    public IActionResult ViewPlan(int id)
     {
         var plan = _db.Plans
             .Include(p => p.PlanBlocks)
@@ -40,7 +40,7 @@ public class MainController(SqliteContext _db) : Controller
             ModelState.Remove("Title"); // Костыль, чтоб убрать сообщение по умолчанию
             ModelState.AddModelError("Title", "Поле обязательно для заполнения");
         }
-        else if (RpdFinder.IsContainSameTitleDifferentId(rpd.Title, rpd.Id, _db))
+        else if (DbFinder.IsContainSameTitleDifferentId(rpd.Title, rpd.Id, _db))
             ModelState.AddModelError("Title", "Такая РПД уже существует");
 
         if (ModelState.IsValid)
@@ -61,6 +61,12 @@ public class MainController(SqliteContext _db) : Controller
         var excelFiles = await UploadExcelFilesModel.Create(files, _db);
 
         return View(excelFiles);
+    }
+    
+    public IActionResult MissingReport()
+    {
+        
+        return View(new MissingReportModel(_db));
     }
 
 

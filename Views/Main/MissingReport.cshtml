@@ -1,0 +1,16 @@
+@model MissingReportModel
+
+@{
+    ViewData["Title"] = "Отчёт";
+}
+
+<h1>Отчёт о отсутсвующих РПД</h1>
+<h4>Следующие РПД упоминаются в планах, но отсутсвуют в базе данных:</h4>
+<ul>
+    @foreach (var i in @Model.MissingRpds)
+    {
+        <li>
+            <a href="@Url.Action("Index", "Main", new { searchString = i.Split(" - ")[^1].Trim() })" title="Поиск похожих по названию">@i</a>
+        </li>
+    }
+</ul>

@@ -1,4 +1,3 @@
-@using Microsoft.AspNetCore.Mvc.ModelBinding
 @model AISIots.Models.DbTables.Rpd
 
 @{
@@ -41,10 +40,10 @@
         <label asp-for="DopProgObesp">Дополнительное программное обеспечение:</label>
         <input asp-for="DopProgObesp" value="@Model.DopProgObesp" class="form-control"/>
 
-        <label asp-for="Osnna">Osnna:</label>
+        <label asp-for="Osnna">Основывается на:</label>
         <input asp-for="Osnna" value="@Model.Osnna" class="form-control"/>
 
-        <label asp-for="Sldla">Sldla:</label>
+        <label asp-for="Sldla">Служит для:</label>
         <input asp-for="Sldla" value="@Model.Sldla" class="form-control"/>
     </div>
     <!-- Поля ввода для списков строк -->

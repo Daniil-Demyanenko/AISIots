@@ -26,7 +26,7 @@ public static class FilesDbLoader
                     {
                         using var parser = new RpdParser(f.info, f.path);
                         var rpd = parser.Parse();
-                        if (RpdFinder.IsContainRpdWithTitle(rpd.Title, db))
+                        if (DbFinder.IsContainRpdWithTitle(rpd.Title, db))
                             problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} -- дубликат");
                         else
                         {
