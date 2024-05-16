@@ -4,8 +4,7 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Главная</h1>
 </div>
 
 @using (Html.BeginForm("Index", "Main", FormMethod.Get))
@@ -20,7 +19,7 @@
     @foreach (var i in Model.Items)
     {
         <li>
-            <a asp-controller="Main" asp-action="@(@Model.IsRpdSearch ? "EditRpd" : "ViewPlan")" asp-route-id="@i.Id">@i.Title</a>
+            <a asp-controller="Main" asp-action="@(@Model.IsRpdSearch ? "EditRpd" : "ViewPlan")" asp-route-id="@i.Id" title="Просмотреть/Редактировать">@i.Title</a>
         </li>
     }
 </ul>

@@ -10,7 +10,7 @@ public class SearchModel(IEnumerable<SearchItem> items, bool isRpdSearch)
 
     public static SearchModel Create(SqliteContext db, string? searchString = null, bool isRpdSearch = true)
     {
-        var searcher = new FuzzyService(db);
+        var searcher = new DbSearch(db);
 
         if (string.IsNullOrEmpty(searchString?.Trim()))
             return searcher.GetNewestRpds();

@@ -4,7 +4,7 @@ using FuzzySharp;
 
 namespace AISIots.Services;
 
-public class FuzzyService(SqliteContext db)
+public class DbSearch(SqliteContext db)
 {
     public SearchModel GetNewestRpds()
     {

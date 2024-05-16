@@ -5,8 +5,9 @@ namespace AISIots.DAL;
 
 public sealed class SqliteContext : DbContext
 {
-    public DbSet<Rpd> Rpds { get; set; }
-    public DbSet<Plan> Plans { get; set; }
+    public DbSet<Rpd> Rpds { get; init; }
+    public DbSet<Plan> Plans { get; init; }
+    public DbSet<User> Users { get; init; }
 
     public SqliteContext(DbContextOptions<SqliteContext> options) : base(options)
     {

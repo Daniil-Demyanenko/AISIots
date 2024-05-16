@@ -1,0 +1,34 @@
+@model LoginModel
+@{
+    ViewData["Title"] = "Вход";
+}
+
+<div class="text-center">
+    <h1 class="display-4">АИС ИОТС</h1>
+
+    <div style="width: 20%; text-align: left">
+        @using (Html.BeginForm("Login", "Main", FormMethod.Post))
+        {
+            <label>Логин</label>
+            <input type="text" name="login" class="form-control">
+            <label>Пароль:</label>
+            <input type="password" name="password" class="form-control">
+            if (Model.CheckPassConfirmError)
+            {
+                <p class="text-danger">Пароли не совпадают.</p>
+            }
+            if (Model.SmallPass)
+            {
+                <p class="text-danger">Пароль не менее 6 символов.</p>
+            }
+
+            if (Model.NeedToRegisterFirstUser)
+            {
+                <label>Подтвердить пароль:</label>
+                <input type="password" name="confirmPassword" class="form-control">
+            }
+
+            <button type="submit" value="Вход" class="btn btn-primary">Поиск</button>
+        }
+    </div>
+</div>
