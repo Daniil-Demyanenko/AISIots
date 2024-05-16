@@ -18,7 +18,11 @@ public class ExportJsonModel
         
         dynamic toExport = new { Plans = plans, RPDs = rpds };
         
-        var options = new JsonSerializerOptions() { WriteIndented = true };
+        var options = new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
         Json = JsonSerializer.Serialize(toExport, options);
     }
 }
