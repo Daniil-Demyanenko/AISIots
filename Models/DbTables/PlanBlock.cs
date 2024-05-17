@@ -2,17 +2,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AISIots.Models.DbTables;
 
-public class PlanBlock(string title)
+public class DisciplineBlock(string title)
 {
     [Key] public int Id { get; set; }
     public string Title { get; set; } = title;
-    public List<BlockSection> BlockSections { get; set; } = new();
+    public List<DisciplineSection> DisciplineSections { get; set; } = new();
 }
 
-public class BlockSection(string title)
+public class DisciplineSection(string title)
 {
     [Key] public int Id { get; set; }
-    public int PlanBlockId { get; set; }
+    public int DisciplineBlockId { get; set; }
     public string Title { get; set; } = title;
     public List<ShortRpd> ShortRpds { get; set; } = new();
 }
@@ -20,7 +20,7 @@ public class BlockSection(string title)
 public class ShortRpd(string discipline, string index)
 {
     [Key] public int Id { get; set; }
-    public int BlockSectionId { get; set; }
+    public int DisciplineSectionId { get; set; }
     public string Discipline { get; set; } = discipline;
     public string Index { get; set; } = index;
 }

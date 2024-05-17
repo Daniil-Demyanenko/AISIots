@@ -39,7 +39,7 @@ public class MainController(SqliteContext _db) : Controller
     {
         var plan = _db.Plans
             .Include(p => p.PlanBlocks)
-            .ThenInclude(pb => pb.BlockSections)
+            .ThenInclude(pb => pb.DisciplineSections)
             .ThenInclude(bs => bs.ShortRpds)
             .FirstOrDefault(p => p.Id == id);
         return View(plan);

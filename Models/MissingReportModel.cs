@@ -12,10 +12,10 @@ public class MissingReportModel
     {
         MissingRpds = db.Plans
             .Include(p => p.PlanBlocks)
-            .ThenInclude(pb => pb.BlockSections)
+            .ThenInclude(pb => pb.DisciplineSections)
             .ThenInclude(bs => bs.ShortRpds)
             .SelectMany(p=>p.PlanBlocks)
-            .SelectMany(b=>b.BlockSections)
+            .SelectMany(b=>b.DisciplineSections)
             .SelectMany(s=>s.ShortRpds)
             .AsEnumerable()
             .Where(rpd=>!DbFinder.IsContainRpdWithTitle(rpd.Discipline, db))

@@ -6,8 +6,9 @@
 <h3>Загрузить Excel файлы</h3>
 @using (Html.BeginForm("UploadFiles", "Main", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <input type="file" name="files" value="Выбрать файлы" multiple accept=".xlsx"/>
-    <input type="submit" value="Загрузить файлы"/>
+    <input type="file" name="files" value="Выбрать файлы" multiple accept=".xlsx" class="form-control"/>
+    <br>
+    <button type="submit" value="Загрузить файлы" class="btn btn-primary">Загрузить файлы</button>
 }
 
 <details>

@@ -31,9 +31,9 @@ public class PlanParser : IDisposable
         return plan;
     }
 
-    private List<PlanBlock> GetPlanBlocks()
+    private List<DisciplineBlock> GetPlanBlocks()
     {
-        List<PlanBlock> planBloks = new();
+        List<DisciplineBlock> planBloks = new();
 
         int lastRow = _wsPlan.LastRowUsed().RowNumber();
         for (int blockRow = 1; blockRow < lastRow; blockRow++) // создание основных блоков
@@ -43,7 +43,7 @@ public class PlanParser : IDisposable
 
             if (!cellValue.Contains("Блок ") || !cell.IsMerged()) continue;
 
-            planBloks.Add(new PlanBlock(cellValue));
+            planBloks.Add(new DisciplineBlock(cellValue));
 
             for (int sectionRow = blockRow + 1; sectionRow < lastRow; sectionRow++) // создание секций в блоке
             {
@@ -52,7 +52,7 @@ public class PlanParser : IDisposable
                 if (!cell.IsMerged()) continue; // в ячейке хранится дисциплина
                 if (cellValue.Contains("Блок ")) break; // начался следующий блок
 
-                planBloks.Last().BlockSections.Add(new BlockSection(cellValue));
+                planBloks.Last().DisciplineSections.Add(new DisciplineSection(cellValue));
 
                 for (int itemRow = sectionRow + 1; itemRow < lastRow; itemRow++) // создание записей в каждой секции
                 {
@@ -62,7 +62,7 @@ public class PlanParser : IDisposable
                     var index = _wsPlan.Cell(itemRow, 2).Value.ToString().Trim();
                     var discipline = _wsPlan.Cell(itemRow, 3).Value.ToString().Trim();
                     
-                    planBloks.Last().BlockSections.Last().ShortRpds.Add(new ShortRpd(discipline, index));
+                    planBloks.Last().DisciplineSections.Last().ShortRpds.Add(new ShortRpd(discipline, index));
                 }
             }
         }

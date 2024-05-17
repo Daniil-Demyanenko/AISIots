@@ -16,14 +16,14 @@ public sealed class SqliteContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<PlanBlock>()
-            .HasMany(p => p.BlockSections)
+        modelBuilder.Entity<DisciplineBlock>()
+            .HasMany(p => p.DisciplineSections)
             .WithOne()
-            .HasForeignKey(b => b.PlanBlockId);
+            .HasForeignKey(b => b.DisciplineBlockId);
 
-        modelBuilder.Entity<BlockSection>()
+        modelBuilder.Entity<DisciplineSection>()
             .HasMany(s => s.ShortRpds)
             .WithOne() 
-            .HasForeignKey(r => r.BlockSectionId); 
+            .HasForeignKey(r => r.DisciplineSectionId);
     }
 }

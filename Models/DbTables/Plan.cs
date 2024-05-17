@@ -6,7 +6,7 @@ public class Plan
 {
     [Key]
     public int Id { get; set; }
-    public List<PlanBlock> PlanBlocks { get; set; }
+    public List<DisciplineBlock> PlanBlocks { get; set; }
     /// <summary>
     /// Год набора группы
     /// </summary>

@@ -12,7 +12,7 @@ public class ExportJsonModel
     {
         var plans = db.Plans
             .Include(p => p.PlanBlocks)
-            .ThenInclude(pb => pb.BlockSections)
+            .ThenInclude(pb => pb.DisciplineSections)
             .ThenInclude(bs => bs.ShortRpds).AsEnumerable();
         var rpds = db.Rpds.AsEnumerable();
         
