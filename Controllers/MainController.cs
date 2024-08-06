@@ -91,7 +91,7 @@ public class MainController(SqliteContext _db) : Controller
         
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.Name, login)
+            new Claim(ClaimTypes.Name, login!)
         };
         var userIdentity = new ClaimsIdentity(claims, "login");
         var userPrincipal = new ClaimsPrincipal(userIdentity);
@@ -107,8 +107,6 @@ public class MainController(SqliteContext _db) : Controller
 
         return RedirectToAction("Index", "Main");
     }
-    
-    // [HttpPost]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync();

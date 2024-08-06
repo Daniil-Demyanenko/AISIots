@@ -45,15 +45,15 @@ public static class ExcelPatternMatcher
     {
         foreach (var worksheet in workbook.Worksheets)
         {
+            if (worksheet.RangeUsed().LastColumn().ColumnNumber() < 30) continue;
+            
             for (int i = 1; i < 10; i++)
             {
-                if (worksheet.RangeUsed().LastColumn().ColumnNumber() < 50) continue;
-
                 var cell1 = worksheet.Cell(i, 1).Value.ToString().Trim();
                 var cell2 = worksheet.Cell(i + 1, 1).Value.ToString().Trim();
                 var cell3 = worksheet.Cell(i + 2, 1).Value.ToString().Trim();
 
-                if (cell1.Contains("Блок") && cell2.Length > 1 && cell3.Length > 0 && cell3[0] == '+')
+                if (cell1.Contains("Блок") && cell2.Length > 1 && cell3.Length > 0 && cell3[0] is '+' or '-')
                     return worksheet.Position;
             }
         }

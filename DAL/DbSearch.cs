@@ -8,7 +8,7 @@ public class DbSearch(SqliteContext db)
 {
     public SearchModel GetNewestRpds()
     {
-        var result = db.Rpds!
+        var result = db.Rpds
             .OrderByDescending(x => x.UpdateDateTime).Take(50)
             .Select(x => new SearchItem(x.Id, x.Title));
         return new SearchModel(result, isRpdSearch: true);

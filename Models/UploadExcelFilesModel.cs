@@ -18,14 +18,14 @@ public class UploadExcelFilesModel
 
     public static async Task<UploadExcelFilesModel> Create(List<IFormFile>? files, SqliteContext db)
     {
-        if (files == null || files.Count == 0) return new UploadExcelFilesModel(loadSuccessful: false, [],[]);
+        if (files == null || files.Count == 0) return new UploadExcelFilesModel(loadSuccessful: false, [], []);
 
         var pathToDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache", DateTime.Now.ToString("dd-MM-yy-") + Guid.NewGuid().ToString().Split('-')[0]);
         Directory.CreateDirectory(pathToDir);
 
         foreach (var file in files)
         {
-            if (file.Length == 0 && Path.GetExtension(file.FileName) == ".xlsx") continue;
+            if (file.Length == 0 || Path.GetExtension(file.FileName) != ".xlsx") continue;
 
             var fileName = Path.GetFileName(file.FileName);
             var path = Path.Combine(pathToDir, fileName);
@@ -35,9 +35,6 @@ public class UploadExcelFilesModel
         }
 
         var (parseSuccess, problemFiles, successFiles) = await FilesDbLoader.TryParseFilesFromDirectoryToDb(pathToDir, db);
-        if (!parseSuccess)
-            return new UploadExcelFilesModel(loadSuccessful: false, successFiles, problemFiles);
-
-        return new UploadExcelFilesModel(loadSuccessful: true, successFiles, problemFiles);
+        return new UploadExcelFilesModel(loadSuccessful: parseSuccess, successFiles, problemFiles);
     }
 }
