@@ -11,6 +11,8 @@ public class LoginModel
     public bool SuccessAuth = false;
     private const int MinPassLen = 6;
 
+    private SqliteContext _db;
+
     #region
 
     // Если ты читаешь это, прости за говнокод... ночь и мало времени
@@ -19,33 +21,44 @@ public class LoginModel
 
     public LoginModel(SqliteContext db, string? login, string? password, string? confirmPassword = null)
     {
+        _db = db;
+
         NeedToRegisterFirstUser = Authentication.NeedToFirstRegister(db);
 
-        if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password)) return;
-        
+        if (!ValidatePassword(login, password, confirmPassword))
+            return;
+
+        SuccessAuth = TryАuthenticate(login!, password!);
+    }
+
+    private bool ValidatePassword(string? login, string? password, string? confirmPassword)
+    {
+        if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password)) return false;
+
         SmallPass = password.Length < MinPassLen;
+        if (SmallPass) return false;
 
         if (NeedToRegisterFirstUser)
         {
             if (password != confirmPassword)
             {
                 CheckPassConfirmError = true;
-                return;
+                return false;
             }
 
-            if (!SmallPass)
-            {
-                SuccessAuth = true;
-                Authentication.AddUserToDb(login, password, db);
-                return;
-            }
-        }
-
-        var userExist = Authentication.ConfirmLoginPassword(login, password, db);
-        if (userExist)
-        {
+            Authentication.AddUserToDb(login, password, _db);
             SuccessAuth = true;
-            if(NeedToRegisterFirstUser) Authentication.AddUserToDb(login, password, db);
+            NeedToRegisterFirstUser = false;
+            return true;
         }
+
+        return true;
+    }
+
+    private bool TryАuthenticate(string login, string password)
+    {
+        var userExist = Authentication.ConfirmLoginPassword(login, password, _db);
+
+        return userExist;
     }
 }
