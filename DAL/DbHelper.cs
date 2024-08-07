@@ -4,7 +4,7 @@ using AISIots.Models.DbTables;
 
 namespace AISIots.Services;
 
-public static class DbFinder
+public static class DbHelper
 {
     public static async Task<Rpd> FindOrCreateRpdById(int? id, SqliteContext db)
     {

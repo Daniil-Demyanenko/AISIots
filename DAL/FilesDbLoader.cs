@@ -26,7 +26,7 @@ public static class FilesDbLoader
                     {
                         using var parser = new RpdParser(f.info, f.path);
                         var rpd = parser.Parse();
-                        if (DbFinder.IsContainRpdWithTitle(rpd.Title, db))
+                        if (DbHelper.IsContainRpdWithTitle(rpd.Title, db))
                             problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} - [дубликат]");
                         else
                         {
@@ -39,7 +39,7 @@ public static class FilesDbLoader
                     {
                         using var parser = new PlanParser(f.info, f.path);
                         var plan = parser.Parse();
-                        if (DbFinder.IsContainLogicalSamePlan(plan, db))
+                        if (DbHelper.IsContainLogicalSamePlan(plan, db))
                             problemFiles.Add($"{Path.GetFileNameWithoutExtension(f.path)} - [дубликат]");
                         else
                         {

@@ -30,7 +30,7 @@ public class MainController(SqliteContext _db) : Controller
     [Authorize]
     public async Task<IActionResult> EditRpd(int? id = null)
     {
-        var rpd = await DbFinder.FindOrCreateRpdById(id, _db);
+        var rpd = await DbHelper.FindOrCreateRpdById(id, _db);
         return View(rpd);
     }
 
@@ -53,7 +53,7 @@ public class MainController(SqliteContext _db) : Controller
             ModelState.Remove("Title"); // Костыль, чтоб убрать сообщение по умолчанию
             ModelState.AddModelError("Title", "Поле обязательно для заполнения");
         }
-        else if (DbFinder.IsContainRpdWithSameTitleDifferentId(rpd.Title, rpd.Id, _db))
+        else if (DbHelper.IsContainRpdWithSameTitleDifferentId(rpd.Title, rpd.Id, _db))
             ModelState.AddModelError("Title", "Такая РПД уже существует");
 
         if (ModelState.IsValid)
@@ -66,7 +66,6 @@ public class MainController(SqliteContext _db) : Controller
 
         return View("EditRpd", rpd);
     }
-
 
     [HttpPost, Authorize]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)

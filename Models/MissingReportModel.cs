@@ -14,13 +14,13 @@ public class MissingReportModel
             .Include(p => p.PlanBlocks)
             .ThenInclude(pb => pb.DisciplineSections)
             .ThenInclude(bs => bs.ShortRpds)
-            .SelectMany(p=>p.PlanBlocks)
-            .SelectMany(b=>b.DisciplineSections)
-            .SelectMany(s=>s.ShortRpds)
+            .SelectMany(p => p.PlanBlocks)
+            .SelectMany(b => b.DisciplineSections)
+            .SelectMany(s => s.ShortRpds)
             .AsEnumerable()
-            .Where(rpd=>!DbFinder.IsContainRpdWithTitle(rpd.Discipline, db))
-            .Select(rpd=> $"{rpd.Index} - {rpd.Discipline}")
+            .Where(rpd => !DbHelper.IsContainRpdWithTitle(rpd.Discipline, db))
+            .Select(rpd => $"{rpd.Index} - {rpd.Discipline}")
             .ToHashSet()
             .Order();
-        }
+    }
 }
