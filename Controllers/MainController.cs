@@ -65,6 +65,7 @@ public class MainController(SqliteContext _db) : Controller
         return View("Index", SearchModel.Create(_db, rpd.Title, isRpdSearch: true));
     }
 
+    [Authorize]
     public async Task<IActionResult> CheckSaveAs(Rpd rpd)
     {
         if (string.IsNullOrEmpty(rpd.Title?.Trim()))
@@ -82,7 +83,17 @@ public class MainController(SqliteContext _db) : Controller
         _db.Rpds.Add(rpd);
         await _db.SaveChangesAsync();
         return View("Index", SearchModel.Create(_db, rpd.Title, isRpdSearch: true));
+    } 
+    
+    [Authorize]
+    public async Task<IActionResult> DeleteRdp(Rpd? rpd)
+    {
+        if (rpd != null) _db.Rpds.Remove(rpd);
+        await _db.SaveChangesAsync();
+
+        return View("Index", SearchModel.Create(_db, rpd?.Title));
     }
+    
 
     [HttpPost, Authorize]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)
