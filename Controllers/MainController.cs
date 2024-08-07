@@ -59,13 +59,27 @@ public class MainController(SqliteContext _db) : Controller
         if (!ModelState.IsValid) return View("EditRpd", rpd);
 
         rpd.UpdateDateTime = DateTime.Now;
-        if (DbHelper.IsContainDifferentTitleSameIdRpd(rpd.Title!, rpd.Id, _db))
-        {
-            rpd.Id = 0;
-            _db.Rpds.Add(rpd);
-        }
-        else _db.Rpds.Update(rpd);
+        _db.Rpds.Update(rpd);
 
+        await _db.SaveChangesAsync();
+        return View("Index", SearchModel.Create(_db, rpd.Title, isRpdSearch: true));
+    }
+
+    public async Task<IActionResult> CheckSaveAs(Rpd rpd)
+    {
+        if (string.IsNullOrEmpty(rpd.Title?.Trim()))
+        {
+            ModelState.Remove("Title");
+            ModelState.AddModelError("Title", "Поле обязательно для заполнения");
+        }
+        else if (await _db.Rpds.AnyAsync(r => r.Title.ToLower() == rpd.Title.ToLower()))
+            ModelState.AddModelError("Title", "РПД с таким названием уже существует");
+
+        if (!ModelState.IsValid) return View("EditRpd", rpd);
+
+        rpd.UpdateDateTime = DateTime.Now;
+        rpd.Id = 0;
+        _db.Rpds.Add(rpd);
         await _db.SaveChangesAsync();
         return View("Index", SearchModel.Create(_db, rpd.Title, isRpdSearch: true));
     }

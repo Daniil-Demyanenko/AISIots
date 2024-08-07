@@ -11,7 +11,7 @@
     <div class="form-group">
         <label asp-for="Title">Название:</label>
         <input asp-for="Title" value="@Model.Title" class="form-control"/>
-        <span asp-validation-for="Title" class="text-danger"></span>
+        <span asp-validation-for="Title" class="text-danger"></span><br/>
 
         <label asp-for="PrepodRegFull">Регалии преподавателя:</label>
         <input asp-for="PrepodRegFull" value="@Model.PrepodRegFull" class="form-control"/>
@@ -80,39 +80,40 @@
     <h4>Курсовые</h4>
     @foreach (var i in Model.KursRab)
     {
-    <textarea name="KursRab" class="form-control">@i</textarea>
+        <textarea name="KursRab" class="form-control">@i</textarea>
     }
 
     <h4>Основная литература</h4>
     @foreach (var i in Model.OsnLitra)
     {
-    <textarea name="OsnLitra" class="form-control">@i</textarea>
+        <textarea name="OsnLitra" class="form-control">@i</textarea>
     }
 
     <h4>Дополнительная литература</h4>
     @foreach (var i in Model.DopLitra)
     {
-    <textarea name="LecAnnotir" class="form-control">@i</textarea>
+        <textarea name="LecAnnotir" class="form-control">@i</textarea>
     }
 
     <h4>Аннотированные лекции</h4>
     @foreach (var i in Model.LecAnnotir)
     {
-    <textarea name="Nsr" class="form-control">@i</textarea>
+        <textarea name="Nsr" class="form-control">@i</textarea>
     }
 
     <h4>ФОС</h4>
     @foreach (var i in Model.Fos)
     {
-    <textarea name="Fos" class="form-control">@i</textarea>
+        <textarea name="Fos" class="form-control">@i</textarea>
     }
 
     <h4>ФОС итог</h4>
     @foreach (var i in Model.FosItog)
     {
-    <textarea name="FosItog" class="form-control">@i</textarea>
+        <textarea name="FosItog" class="form-control">@i</textarea>
     }
 
     <input type="hidden" name="Id" value="@Model.Id">
     <button type="submit" class="btn btn-primary">Сохранить</button>
+    <button type="submit" class="btn btn-secondary" asp-action="CheckSaveAs" asp-controller="Main" method="post" title="Сохранить РПД под другим именем (уже введено на странице вверху)">Сохранить как</button>
 </form>
