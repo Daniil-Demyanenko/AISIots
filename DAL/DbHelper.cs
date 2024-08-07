@@ -8,11 +8,7 @@ public static class DbHelper
 {
     public static async Task<Rpd> FindOrCreateRpdById(int? id, SqliteContext db)
     {
-        var rpd = await db.Rpds.FindAsync(id);
-        if (rpd is null)
-        {
-            rpd = (await db.Rpds.AddAsync(new Rpd())).Entity;
-        }
+        var rpd = await db.Rpds.FindAsync(id) ?? (await db.Rpds.AddAsync(new Rpd())).Entity;
 
         return Normalize(rpd);
     }
@@ -26,6 +22,9 @@ public static class DbHelper
 
     public static bool IsContainRpdWithSameTitleDifferentId(string title, int id, SqliteContext db)
         => db.Rpds.Any(x => x.Title.ToLower() == title.ToLower() && x.Id != id);
+    
+    public static bool IsContainDifferentTitleSameIdRpd(string title, int id, SqliteContext db)
+        => db.Rpds.Any(x => x.Title.ToLower() != title.ToLower() && x.Id == id);
 
     private static Rpd Normalize(Rpd rpd)
     {

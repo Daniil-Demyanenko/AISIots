@@ -46,7 +46,7 @@ public class MainController(SqliteContext _db) : Controller
     }
 
     [HttpPost, Authorize]
-    public IActionResult CheckSave(Rpd rpd)
+    public async Task<IActionResult> CheckSave(Rpd rpd)
     {
         if (string.IsNullOrEmpty(rpd.Title?.Trim()))
         {
@@ -56,15 +56,18 @@ public class MainController(SqliteContext _db) : Controller
         else if (DbHelper.IsContainRpdWithSameTitleDifferentId(rpd.Title, rpd.Id, _db))
             ModelState.AddModelError("Title", "Такая РПД уже существует");
 
-        if (ModelState.IsValid)
-        {
-            rpd.UpdateDateTime = DateTime.Now;
-            _db.Rpds.Update(rpd);
-            _db.SaveChanges();
-            return View("Index", SearchModel.Create(_db, rpd.Title, isRpdSearch: true));
-        }
+        if (!ModelState.IsValid) return View("EditRpd", rpd);
 
-        return View("EditRpd", rpd);
+        rpd.UpdateDateTime = DateTime.Now;
+        if (DbHelper.IsContainDifferentTitleSameIdRpd(rpd.Title!, rpd.Id, _db))
+        {
+            rpd.Id = 0;
+            _db.Rpds.Add(rpd);
+        }
+        else _db.Rpds.Update(rpd);
+
+        await _db.SaveChangesAsync();
+        return View("Index", SearchModel.Create(_db, rpd.Title, isRpdSearch: true));
     }
 
     [HttpPost, Authorize]
@@ -87,7 +90,7 @@ public class MainController(SqliteContext _db) : Controller
         LoginModel model = new(_db, login, password, confirmPassword);
 
         if (!model.SuccessAuth) return View(model);
-        
+
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, login!)
@@ -100,12 +103,13 @@ public class MainController(SqliteContext _db) : Controller
             userPrincipal,
             new AuthenticationProperties
             {
-                IsPersistent = true, 
+                IsPersistent = true,
                 ExpiresUtc = DateTime.UtcNow.AddDays(3)
             });
 
         return RedirectToAction("Index", "Main");
     }
+
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync();
