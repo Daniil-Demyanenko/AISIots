@@ -18,13 +18,12 @@ public static class DbHelper
                              x.LearningForm == plan.LearningForm && x.Institute == plan.Institute);
 
     public static bool IsContainRpdWithTitle(string title, SqliteContext db)
-        => db.Rpds.Any(x => x.Title == title);
+    // Может проблема с кодировками или хз, но без AsEnumerable не находило даже точные соответствия. 
+        => db.Rpds.AsEnumerable().Any(x => x.Title.ToLower() == title.ToLower());
+
 
     public static bool IsContainRpdWithSameTitleDifferentId(string title, int id, SqliteContext db)
         => db.Rpds.Any(x => x.Title.ToLower() == title.ToLower() && x.Id != id);
-    
-    public static bool IsContainDifferentTitleSameIdRpd(string title, int id, SqliteContext db)
-        => db.Rpds.Any(x => x.Title.ToLower() != title.ToLower() && x.Id == id);
 
     private static Rpd Normalize(Rpd rpd)
     {
