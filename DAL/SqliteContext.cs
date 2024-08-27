@@ -23,7 +23,7 @@ public sealed class SqliteContext : DbContext
 
         modelBuilder.Entity<DisciplineSection>()
             .HasMany(s => s.ShortRpds)
-            .WithOne() 
+            .WithOne()
             .HasForeignKey(r => r.DisciplineSectionId);
     }
 }

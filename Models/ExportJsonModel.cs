@@ -7,7 +7,7 @@ namespace AISIots.Models;
 public class ExportJsonModel
 {
     public readonly string Json;
-    
+
     public ExportJsonModel(SqliteContext db)
     {
         var plans = db.Plans
@@ -15,9 +15,9 @@ public class ExportJsonModel
             .ThenInclude(pb => pb.DisciplineSections)
             .ThenInclude(bs => bs.ShortRpds).AsEnumerable();
         var rpds = db.Rpds.AsEnumerable();
-        
+
         dynamic toExport = new { Plans = plans, RPDs = rpds };
-        
+
         var options = new JsonSerializerOptions()
         {
             WriteIndented = true,

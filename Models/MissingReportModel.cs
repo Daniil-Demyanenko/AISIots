@@ -1,4 +1,5 @@
 using AISIots.DAL;
+using AISIots.Models.DbTables;
 using AISIots.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,5 +23,5 @@ public class MissingReportModel
             .Select(rpd => $"{rpd.Index} - {rpd.Discipline}")
             .ToHashSet()
             .Order();
-    }
+        }
 }

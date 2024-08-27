@@ -1,7 +1,7 @@
 @model AISIots.Models.DbTables.Rpd
 
 @{
-ViewData["Title"] = "Редактировать РПД";
+    ViewData["Title"] = "Редактировать РПД";
 }
 
 <p>Дата последнего редактирования: @Model.GetFormatedDateTime()</p>
@@ -50,77 +50,79 @@ ViewData["Title"] = "Редактировать РПД";
     <h4>Задания:</h4>
     @foreach (var i in Model.Zad)
     {
-    <textarea name="Zad" class="form-control">@i</textarea>
+        <textarea name="Zad" class="form-control">@i</textarea>
     }
 
     <h4>Лекции</h4>
     @foreach (var i in Model.Nlec)
     {
-    <textarea name="Nlec" class="form-control">@i</textarea>
+        <textarea name="Nlec" class="form-control">@i</textarea>
     }
 
     <h4>Практические</h4>
     @foreach (var i in Model.Npract)
     {
-    <textarea name="Npract" class="form-control">@i</textarea>
+        <textarea name="Npract" class="form-control">@i</textarea>
     }
 
     <h4>Лабораторные</h4>
     @foreach (var i in Model.Nlab)
     {
-    <textarea name="Nlab" class="form-control">@i</textarea>
+        <textarea name="Nlab" class="form-control">@i</textarea>
     }
 
     <h4>Самостоятельные</h4>
     @foreach (var i in Model.Nsr)
     {
-    <textarea name="Nsr" class="form-control">@i</textarea>
+        <textarea name="Nsr" class="form-control">@i</textarea>
     }
 
     <h4>Курсовые</h4>
     @foreach (var i in Model.KursRab)
     {
-    <textarea name="KursRab" class="form-control">@i</textarea>
+        <textarea name="KursRab" class="form-control">@i</textarea>
     }
 
     <h4>Основная литература</h4>
     @foreach (var i in Model.OsnLitra)
     {
-    <textarea name="OsnLitra" class="form-control">@i</textarea>
+        <textarea name="OsnLitra" class="form-control">@i</textarea>
     }
 
     <h4>Дополнительная литература</h4>
     @foreach (var i in Model.DopLitra)
     {
-    <textarea name="LecAnnotir" class="form-control">@i</textarea>
+        <textarea name="LecAnnotir" class="form-control">@i</textarea>
     }
 
     <h4>Аннотированные лекции</h4>
     @foreach (var i in Model.LecAnnotir)
     {
-    <textarea name="Nsr" class="form-control">@i</textarea>
+        <textarea name="Nsr" class="form-control">@i</textarea>
     }
 
     <h4>ФОС</h4>
     @foreach (var i in Model.Fos)
     {
-    <textarea name="Fos" class="form-control">@i</textarea>
+        <textarea name="Fos" class="form-control">@i</textarea>
     }
 
     <h4>ФОС итог</h4>
     @foreach (var i in Model.FosItog)
     {
-    <textarea name="FosItog" class="form-control">@i</textarea>
+        <textarea name="FosItog" class="form-control">@i</textarea>
     }
 
     <input type="hidden" name="Id" value="@Model.Id">
     <div id="btn-bar">
         <button type="submit" class="btn btn-primary">Сохранить</button>
         <button type="submit" class="btn btn-secondary" asp-action="CheckSaveAs" asp-controller="Main" method="post"
-                title="Сохранить РПД под другим именем (уже введено на странице вверху)">Сохранить как
+                title="Сохранить РПД под другим именем (уже введено на странице вверху)">
+            Сохранить как
         </button>
         <button type="submit" class="btn btn-danger text-white" asp-action="DeleteRdp" asp-controller="Main"
-                method="post" title="Удалит открытую сейчас РПД">Удалить
+                method="post" title="Удалит открытую сейчас РПД">
+            Удалить
         </button>
     </div>
 </form>

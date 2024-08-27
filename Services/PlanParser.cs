@@ -27,7 +27,7 @@ public class PlanParser : IDisposable
         var plan = GetPlanWithOnlyTitle();
         plan.GroupYear = GetGroupYear();
         plan.PlanBlocks = GetPlanBlocks();
-        
+
         return plan;
     }
 
@@ -61,7 +61,7 @@ public class PlanParser : IDisposable
 
                     var index = _wsPlan.Cell(itemRow, 2).Value.ToString().Trim();
                     var discipline = _wsPlan.Cell(itemRow, 3).Value.ToString().Trim();
-                    
+
                     planBloks.Last().DisciplineSections.Last().ShortRpds.Add(new ShortRpd(discipline, index));
                 }
             }
@@ -91,7 +91,7 @@ public class PlanParser : IDisposable
             var cell = _wsTitle.Cell(foundRow, col).Value.ToString();
             if (int.TryParse(cell, out result)) return result;
         }
-        
+
         return -1;
     }
 
