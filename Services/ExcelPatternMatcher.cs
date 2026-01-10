@@ -8,13 +8,20 @@ public static class ExcelPatternMatcher
 {
     public static ExcelPatternMatchingResult GetTemplateType(string path)
     {
-        using var workbook = new XLWorkbook(path);
+        try
+        {
+            using var workbook = new XLWorkbook(path);
 
-        var rpdPage = IndexOfPageWithRPD(workbook);
-        if (rpdPage != -1) return new ExcelPatternMatchingResult(ExcelFileType.Rpd, rpdPage);
+            var rpdPage = IndexOfPageWithRPD(workbook);
+            if (rpdPage != -1) return new ExcelPatternMatchingResult(ExcelFileType.Rpd, rpdPage);
 
-        var planPage = IndexOfPageWithPlan(workbook);
-        if (planPage != -1) return new ExcelPatternMatchingResult(ExcelFileType.Plan, planPage);
+            var planPage = IndexOfPageWithPlan(workbook);
+            if (planPage != -1) return new ExcelPatternMatchingResult(ExcelFileType.Plan, planPage);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
 
         return new ExcelPatternMatchingResult(ExcelFileType.Undefined, -1);
     }

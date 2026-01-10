@@ -14,7 +14,7 @@ public static class DbHelper
     }
 
     public static bool IsContainLogicalSamePlan(Plan plan, SqliteContext db)
-        => db.Plans.Any(x => x.Profile.ToLower() == plan.Profile.ToLower() && x.GroupYear == plan.GroupYear && x.Level.ToLower() == plan.Level.ToLower() &&
+        => db.Plans.AsEnumerable().Any(x => x.Profile.ToLower() == plan.Profile.ToLower() && x.GroupYear == plan.GroupYear && x.Level.ToLower() == plan.Level.ToLower() &&
                              x.LearningForm == plan.LearningForm && x.Institute == plan.Institute);
 
     public static bool IsContainRpdWithTitle(string title, SqliteContext db)

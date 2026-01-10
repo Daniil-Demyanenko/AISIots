@@ -10,7 +10,14 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
-
+//TODO: История изменений
+//TODO: Комментарии к РПД
+//TODO: Вывод информации о Плане -> добавить офо/зфо, очн/заочн
+//TODO: Отчёт -> убрать шифр, исключить дублирование названий
+//TODO: Учётка админа добавляет другие учётки
+//TODO: Установка ответственных
+//TODO: Кнопка удалить у плана
+//TODO: Исправить дублирование планов
 namespace AISIots.Controllers;
 
 public class MainController(SqliteContext db) : Controller

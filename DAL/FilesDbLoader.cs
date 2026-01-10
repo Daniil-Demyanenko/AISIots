@@ -1,12 +1,12 @@
-using AISIots.DAL;
 using AISIots.Models.DbTables;
+using AISIots.Services;
 
-namespace AISIots.Services;
+namespace AISIots.DAL;
 
 public static class FilesDbLoader
 {
     public static async Task<(bool status, IEnumerable<string> problemFiles, IEnumerable<string> successFiles)> TryParseFilesFromDirectoryToDb(string pathToDir,
-        SqliteContext db)
+        SqliteContext db) // TODO: разбить на методы
     {
         List<string> problemFiles = new();
         List<string> successFiles = new();

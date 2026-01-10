@@ -25,7 +25,7 @@ public class UploadExcelFilesModel
 
         foreach (var file in files)
         {
-            if (file.Length == 0 || Path.GetExtension(file.FileName) != ".xlsx") continue;
+            if (file.Length == 0) continue;
 
             var fileName = Path.GetFileName(file.FileName);
             var path = Path.Combine(pathToDir, fileName);
@@ -35,6 +35,7 @@ public class UploadExcelFilesModel
         }
 
         var (parseSuccess, problemFiles, successFiles) = await FilesDbLoader.TryParseFilesFromDirectoryToDb(pathToDir, db);
+        Directory.Delete(pathToDir, true);
         return new UploadExcelFilesModel(loadSuccessful: parseSuccess, successFiles, problemFiles);
     }
 }
