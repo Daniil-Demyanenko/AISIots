@@ -22,6 +22,8 @@ namespace AISIots.Controllers;
 
 public class MainController(SqliteContext db) : Controller
 {
+    DbRepository _repository = new DbRepository(db);
+    
     [Authorize]
     public IActionResult Index(string? searchString = null, bool isRpdSearch = true)
     {
@@ -37,7 +39,7 @@ public class MainController(SqliteContext db) : Controller
     [Authorize]
     public async Task<IActionResult> EditRpd(int? id = null)
     {
-        var rpd = await DbHelper.FindOrCreateRpdById(id, db);
+        var rpd = await _repository.FindOrCreateRpdById(id);
         return View(rpd);
     }
 
@@ -60,7 +62,7 @@ public class MainController(SqliteContext db) : Controller
             ModelState.Remove("Title"); // Костыль, чтоб убрать сообщение по умолчанию
             ModelState.AddModelError("Title", "Поле обязательно для заполнения");
         }
-        else if (DbHelper.IsContainRpdWithSameTitleDifferentId(rpd.Title, rpd.Id, db))
+        else if (_repository.IsContainRpdWithSameTitleDifferentId(rpd.Title, rpd.Id))
             ModelState.AddModelError("Title", "Такая РПД уже существует");
 
         if (!ModelState.IsValid) return View("EditRpd", rpd);
@@ -107,15 +109,15 @@ public class MainController(SqliteContext db) : Controller
     [Authorize]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)
     {
-        var excelFiles = await UploadExcelFilesModel.Create(files, db);
+        var excelFiles = await UploadExcelFilesModel.Create(files, _repository);
 
         return View(excelFiles);
     }
 
     [Authorize]
-    public IActionResult MissingReport()
+    public async Task<IActionResult> MissingReport()
     {
-        return View(new MissingReportModel(db));
+        return View(await MissingReportModel.Create(_repository));
     }
 
     [AllowAnonymous]

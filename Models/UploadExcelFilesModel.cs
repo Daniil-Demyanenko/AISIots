@@ -16,7 +16,7 @@ public class UploadExcelFilesModel
         SuccessFiles = successFiles;
     }
 
-    public static async Task<UploadExcelFilesModel> Create(List<IFormFile>? files, SqliteContext db)
+    public static async Task<UploadExcelFilesModel> Create(List<IFormFile>? files, DbRepository db)
     {
         if (files == null || files.Count == 0) return new UploadExcelFilesModel(loadSuccessful: false, [], []);
 
@@ -34,7 +34,7 @@ public class UploadExcelFilesModel
             await file.CopyToAsync(stream);
         }
 
-        var (parseSuccess, problemFiles, successFiles) = await FilesDbLoader.TryParseFilesFromDirectoryToDb(pathToDir, db);
+        var (parseSuccess, problemFiles, successFiles) = await db.TryParseFilesFromDirectoryToDb(pathToDir);
         Directory.Delete(pathToDir, true);
         return new UploadExcelFilesModel(loadSuccessful: parseSuccess, successFiles, problemFiles);
     }

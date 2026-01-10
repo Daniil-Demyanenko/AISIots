@@ -7,21 +7,16 @@ namespace AISIots.Models;
 
 public class MissingReportModel
 {
-    public IEnumerable<string> MissingRpds;
+    public IEnumerable<string> MissingRpds { get; init; }
 
-    public MissingReportModel(SqliteContext db)
+    private MissingReportModel(IEnumerable<string> missingRpds)
     {
-        MissingRpds = db.Plans
-            .Include(p => p.PlanBlocks)
-            .ThenInclude(pb => pb.DisciplineSections)
-            .ThenInclude(bs => bs.ShortRpds)
-            .SelectMany(p => p.PlanBlocks)
-            .SelectMany(b => b.DisciplineSections)
-            .SelectMany(s => s.ShortRpds)
-            .AsEnumerable()
-            .Where(rpd => !DbHelper.IsContainRpdWithTitle(rpd.Discipline, db))
-            .Select(rpd => $"{rpd.Index} - {rpd.Discipline}")
-            .ToHashSet()
-            .Order();
-        }
+        MissingRpds = missingRpds;
+    }
+
+    public static async Task<MissingReportModel> Create(DbRepository repository)
+    {
+        var missingRpds = await repository.GetMissingRpds();
+        return new MissingReportModel(missingRpds);
+    }
 }
