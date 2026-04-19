@@ -1,14 +1,21 @@
 using System.Text.Json;
 using AISIots.DAL;
+using AISIots.Interfaces;
+using AISIots.Models;
+using AISIots.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace AISIots.Models;
+namespace AISIots.Services;
 
-public class ExportJsonModel
+public class ReportService(SqliteContext db, IDbRepository repository) : IReportService
 {
-    public readonly string Json;
+    public async Task<MissingReportModel> GetMissingRpdsReportAsync()
+    {
+        var missingRpds = await repository.GetMissingRpds();
+        return new MissingReportModel { MissingRpds = missingRpds };
+    }
 
-    public ExportJsonModel(SqliteContext db)
+    public ExportJsonModel GetExportJson()
     {
         var plans = db.Plans
             .Include(p => p.PlanBlocks)
@@ -23,6 +30,7 @@ public class ExportJsonModel
             WriteIndented = true,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
-        Json = JsonSerializer.Serialize(toExport, options);
+        
+        return new ExportJsonModel { Json = JsonSerializer.Serialize(toExport, options) };
     }
 }

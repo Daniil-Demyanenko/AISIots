@@ -1,11 +1,14 @@
 using System.Text.RegularExpressions;
 using AISIots.Models;
+using AISIots.ViewModels;
 using AISIots.Models.DbTables;
 using ClosedXML.Excel;
 
+using AISIots.Interfaces;
+
 namespace AISIots.Services;
 
-public class PlanParser : IDisposable
+public class PlanParser : IExcelParser<Plan>
 {
     private readonly XLWorkbook _wb;
     private readonly IXLWorksheet _wsTitle;

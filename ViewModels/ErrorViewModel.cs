@@ -1,4 +1,4 @@
-namespace AISIots.Models;
+namespace AISIots.ViewModels;
 
 public class ErrorViewModel
 {

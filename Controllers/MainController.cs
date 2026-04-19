@@ -1,14 +1,13 @@
 using System.Diagnostics;
 using System.Security.Claims;
-using AISIots.DAL;
 using Microsoft.AspNetCore.Mvc;
 using AISIots.Models;
+using AISIots.ViewModels;
 using AISIots.Models.DbTables;
-using AISIots.Services;
+using AISIots.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 //TODO: История изменений
 //TODO: Комментарии к РПД
@@ -20,110 +19,97 @@ using Microsoft.EntityFrameworkCore;
 //TODO: Исправить дублирование планов
 namespace AISIots.Controllers;
 
-public class MainController(SqliteContext db) : Controller
+public class MainController(
+    IPlanService planService,
+    IReportService reportService,
+    IFileProcessingService fileProcessingService,
+    IAuthService authService) : Controller
 {
-    DbRepository _repository = new DbRepository(db);
-    
     [Authorize]
     public IActionResult Index(string? searchString = null, bool isRpdSearch = true)
     {
-        return View(SearchModel.Create(db, searchString, isRpdSearch));
+        return View(planService.Search(searchString, isRpdSearch));
     }
 
     [Authorize]
     public IActionResult ImportExport()
     {
-        return View(new ExportJsonModel(db));
+        return View(reportService.GetExportJson());
     }
 
     [Authorize]
     public async Task<IActionResult> EditRpd(int? id = null)
     {
-        var rpd = await _repository.FindOrCreateRpdById(id);
+        var rpd = await planService.FindOrCreateRpdByIdAsync(id);
         return View(rpd);
     }
 
     [Authorize]
     public IActionResult ViewPlan(int id)
     {
-        var plan = db.Plans
-            .Include(p => p.PlanBlocks)
-            .ThenInclude(pb => pb.DisciplineSections)
-            .ThenInclude(bs => bs.ShortRpds)
-            .FirstOrDefault(p => p.Id == id);
+        var plan = planService.GetPlanById(id);
         return View(plan);
     }
 
     [HttpPost, Authorize]
     public async Task<IActionResult> CheckSave(Rpd rpd)
     {
-        if (string.IsNullOrEmpty(rpd.Title?.Trim()))
+        var errorMessage = await planService.UpdateRpdAsync(rpd);
+        if (errorMessage != null)
         {
-            ModelState.Remove("Title"); // Костыль, чтоб убрать сообщение по умолчанию
-            ModelState.AddModelError("Title", "Поле обязательно для заполнения");
+            if (errorMessage == "Поле обязательно для заполнения")
+                ModelState.Remove("Title");
+                
+            ModelState.AddModelError("Title", errorMessage);
         }
-        else if (_repository.IsContainRpdWithSameTitleDifferentId(rpd.Title, rpd.Id))
-            ModelState.AddModelError("Title", "Такая РПД уже существует");
 
         if (!ModelState.IsValid) return View("EditRpd", rpd);
 
-        rpd.UpdateDateTime = DateTime.Now;
-        db.Rpds.Update(rpd);
-
-        await db.SaveChangesAsync();
-        return View("Index", SearchModel.Create(db, rpd.Title, isRpdSearch: true));
+        return View("Index", planService.Search(rpd.Title, isRpdSearch: true));
     }
 
     [Authorize]
     public async Task<IActionResult> CheckSaveAs(Rpd rpd)
     {
-        if (string.IsNullOrEmpty(rpd.Title?.Trim()))
+        var errorMessage = await planService.CreateRpdAsync(rpd);
+        if (errorMessage != null)
         {
-            ModelState.Remove("Title");
-            ModelState.AddModelError("Title", "Поле обязательно для заполнения");
+            if (errorMessage == "Поле обязательно для заполнения")
+                ModelState.Remove("Title");
+                
+            ModelState.AddModelError("Title", errorMessage);
         }
-        else if (await db.Rpds.AnyAsync(r => r.Title.ToLower() == rpd.Title.ToLower()))
-            ModelState.AddModelError("Title", "РПД с таким названием уже существует");
 
         if (!ModelState.IsValid) return View("EditRpd", rpd);
 
-        rpd.UpdateDateTime = DateTime.Now;
-        rpd.Id = 0;
-        db.Rpds.Add(rpd);
-        await db.SaveChangesAsync();
-        return View("Index", SearchModel.Create(db, rpd.Title, isRpdSearch: true));
+        return View("Index", planService.Search(rpd.Title, isRpdSearch: true));
     }
 
     [Authorize]
     public async Task<IActionResult> DeleteRdp(Rpd? rpd)
     {
-        rpd = await db.Rpds.FindAsync(rpd?.Id);
-        if (rpd is not null) db.Rpds.Remove(rpd);
-        await db.SaveChangesAsync();
-
-        return View("Index", SearchModel.Create(db, rpd?.Title));
+        await planService.DeleteRpdAsync(rpd?.Id);
+        return View("Index", planService.Search(rpd?.Title, isRpdSearch: true));
     }
-
 
     [HttpPost]
     [Authorize]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)
     {
-        var excelFiles = await UploadExcelFilesModel.Create(files, _repository);
-
+        var excelFiles = await fileProcessingService.ProcessUploadedFilesAsync(files);
         return View(excelFiles);
     }
 
     [Authorize]
     public async Task<IActionResult> MissingReport()
     {
-        return View(await MissingReportModel.Create(_repository));
+        return View(await reportService.GetMissingRpdsReportAsync());
     }
 
     [AllowAnonymous]
     public async Task<IActionResult> Login(string? login, string? password, string? confirmPassword)
     {
-        LoginModel model = new(db, login, password, confirmPassword);
+        var model = authService.ProcessLogin(login, password, confirmPassword);
 
         if (!model.SuccessAuth) return View(model);
 

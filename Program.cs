@@ -1,16 +1,23 @@
-using System.Text;
 using AISIots.DAL;
+using AISIots.Interfaces;
 using AISIots.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Add SQLite
 var basePath = AppDomain.CurrentDomain.BaseDirectory;
 builder.Services.AddDbContext<SqliteContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnectionString")?.Replace("[DataDirectory]", basePath)));
+
+// Регистрация сервисов и репозитория
+builder.Services.AddScoped<IDbRepository, DbRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPlanService, PlanService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IParserFactory, ParserFactory>();
+builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
 
 // Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

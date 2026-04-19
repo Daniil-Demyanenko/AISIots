@@ -1,9 +1,11 @@
 using AISIots.Models.DbTables;
 using ClosedXML.Excel;
 
+using AISIots.Interfaces;
+
 namespace AISIots.Services;
 
-public class RpdParser : IDisposable
+public class RpdParser : IExcelParser<Rpd>
 {
     private readonly string _path;
     private readonly XLWorkbook? _wb;
