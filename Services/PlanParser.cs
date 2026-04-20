@@ -1,9 +1,6 @@
 using System.Text.RegularExpressions;
-using AISIots.Models;
-using AISIots.ViewModels;
 using AISIots.Models.DbTables;
 using ClosedXML.Excel;
-
 using AISIots.Interfaces;
 
 namespace AISIots.Services;
@@ -38,7 +35,7 @@ public class PlanParser : IExcelParser<Plan>
     {
         List<DisciplineBlock> planBloks = new();
 
-        int lastRow = _wsPlan.LastRowUsed().RowNumber();
+        int lastRow = _wsPlan.LastRowUsed()!.RowNumber();
         for (int blockRow = 1; blockRow < lastRow; blockRow++) // создание основных блоков
         {
             var cell = _wsPlan.Cell(blockRow, 1);
@@ -76,7 +73,7 @@ public class PlanParser : IExcelParser<Plan>
     private int GetGroupYear()
     {
         var (foundRow, foundCol) = (0, 0);
-        int lastRow = _wsTitle.LastRowUsed().RowNumber();
+        int lastRow = _wsTitle.LastRowUsed()!.RowNumber();
         int lastCol = _wsTitle.LastColumnUsed().ColumnNumber();
 
         for (int row = 1; row <= lastRow; row++)
@@ -103,7 +100,7 @@ public class PlanParser : IExcelParser<Plan>
         Plan result = new Plan();
 
         var visibleRows = new List<int>();
-        int lastRow = _wsTitle.LastRowUsed().RowNumber();
+        int lastRow = _wsTitle.LastRowUsed()!.RowNumber();
         for (int i = 1; i <= lastRow; i++)
         {
             var cell = _wsTitle.Cell(i, 1);
@@ -127,7 +124,7 @@ public class PlanParser : IExcelParser<Plan>
         // Поиск кода направления обучения
         string pattern = @"^\s*\d{1,2}\.\d{1,2}\.\d{1,2}\s+[А-Яа-яA-Za-z\(\)\s]+$";
         Regex regex = new Regex(pattern);
-        int lastCol = _wsTitle.LastColumnUsed().ColumnNumber();
+        int lastCol = _wsTitle.LastColumnUsed()!.ColumnNumber();
         foreach (var row in visibleRows)
         {
             for (int col = 1; col <= lastCol; col++)

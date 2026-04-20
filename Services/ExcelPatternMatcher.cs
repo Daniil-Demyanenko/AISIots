@@ -52,7 +52,7 @@ public static class ExcelPatternMatcher
     {
         foreach (var worksheet in workbook.Worksheets)
         {
-            if (worksheet.RangeUsed().LastColumn().ColumnNumber() < 30) continue;
+            if (worksheet.RangeUsed()?.LastColumn().ColumnNumber() < 30) continue;
 
             for (int i = 1; i < 10; i++)
             {

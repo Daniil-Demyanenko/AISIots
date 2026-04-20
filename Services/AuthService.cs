@@ -2,37 +2,44 @@ using System.Security.Cryptography;
 using System.Text;
 using AISIots.DAL;
 using AISIots.Interfaces;
-using AISIots.Models;
 using AISIots.ViewModels;
 using AISIots.Models.DbTables;
+using System.Security.Claims;
 
 namespace AISIots.Services;
 
-public class AuthService(SqliteContext db) : IAuthService
+public class AuthService(IDbRepository repository) : IAuthService
 {
     private const int MinPassLen = 6;
 
-    public bool ConfirmLoginPassword(string login, string password)
+    public async Task<bool> ConfirmLoginPassword(string login, string password)
     {
         using SHA256 sha = SHA256.Create();
         var pass = sha.ComputeHash(Encoding.ASCII.GetBytes(password));
-        return db.Users.Any(x => x.Login == login && x.Password == pass);
+        var user = await repository.GetUserByLoginAsync(login);
+        return user != null && user.Password.SequenceEqual(pass);
     }
 
-    public void AddUserToDb(string login, string password)
+    public async Task AddUserToDb(string login, string password)
     {
         using SHA256 sha = SHA256.Create();
         var pass = sha.ComputeHash(Encoding.ASCII.GetBytes(password));
-        var user = new User() { Login = login, Password = pass };
-        db.Users.Add(user);
-        db.SaveChanges();
+        var isFirstUser = await repository.AnyUsersAsync();
+        var user = new User()
+        {
+            Login = login,
+            Password = pass,
+            RoleId = !isFirstUser ? 1 : 3 // 1 = MainAdmin, 3 = User
+        };
+        await repository.AddUserAsync(user);
     }
 
-    public bool NeedToFirstRegister() => !db.Users.Any();
+    public async Task<bool> NeedToFirstRegister() => !await repository.AnyUsersAsync();
 
-    public LoginModel ProcessLogin(string? login, string? password, string? confirmPassword)
+    public async Task<LoginModel> ProcessLogin(string? login, string? password, string? confirmPassword)
     {
-        var model = new LoginModel { NeedToRegisterFirstUser = NeedToFirstRegister() };
+        var needRegister = await NeedToFirstRegister();
+        var model = new LoginModel { NeedToRegisterFirstUser = needRegister };
 
         if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             return model;
@@ -47,13 +54,34 @@ public class AuthService(SqliteContext db) : IAuthService
                 model.CheckPassConfirmError = true;
                 return model;
             }
-            AddUserToDb(login, password);
+
+            await AddUserToDb(login, password);
             model.SuccessAuth = true;
             model.NeedToRegisterFirstUser = false;
             return model;
         }
 
-        model.SuccessAuth = ConfirmLoginPassword(login, password);
+        model.SuccessAuth = await ConfirmLoginPassword(login, password);
         return model;
+    }
+
+    public async Task<string> GetUserRole(string login)
+    {
+        var user = await repository.GetUserByLoginAsync(login);
+        return user?.Role?.Name ?? "User";
+    }
+
+    public ClaimsPrincipal CreatePrincipal(string login)
+    {
+        var user = repository.GetUserByLoginAsync(login).Result;
+        var role = user?.Role?.Name ?? "User";
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, login),
+            new Claim(ClaimTypes.Role, role)
+        };
+        var identity = new ClaimsIdentity(claims, "login");
+        return new ClaimsPrincipal(identity);
     }
 }

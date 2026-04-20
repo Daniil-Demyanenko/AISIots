@@ -5,7 +5,7 @@ namespace AISIots.Models.DbTables;
 public class Rpd
 {
     [Key] public int Id { get; set; }
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
     public DateTime UpdateDateTime { get; set; }
     public string? PrepodRegFull { get; set; }
     public string? PrepodRegFullShort { get; set; }
@@ -29,6 +29,8 @@ public class Rpd
     public List<string> KursRab { get; set; } = [];
     public List<string> Fos { get; set; } = [];
     public List<string> FosItog { get; set; } = [];
+
+    public bool IsDeleted { get; set; } = false;
 
     public Rpd()
     {

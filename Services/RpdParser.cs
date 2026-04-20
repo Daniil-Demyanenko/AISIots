@@ -1,6 +1,5 @@
 using AISIots.Models.DbTables;
 using ClosedXML.Excel;
-
 using AISIots.Interfaces;
 
 namespace AISIots.Services;
@@ -33,7 +32,10 @@ public class RpdParser : IExcelParser<Rpd>
         var title = Path.GetFileNameWithoutExtension(_path);
         result.Add("title", title);
 
-        int rowUsedCount = _ws.LastRowUsed().RowNumber();
+        var lastRowUsed = _ws.LastRowUsed();
+        if (lastRowUsed == null) return result;
+
+        int rowUsedCount = lastRowUsed.RowNumber();
         for (var i = 1; i < rowUsedCount; i++)
         {
             var cell1 = _ws.Cell(i, 1);

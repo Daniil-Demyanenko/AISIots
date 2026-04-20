@@ -8,8 +8,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add SQLite
 var basePath = AppDomain.CurrentDomain.BaseDirectory;
+var connectionString = builder.Configuration.GetConnectionString("SQLiteConnectionString")?.Replace("[DataDirectory]", basePath);
+if (!string.IsNullOrEmpty(connectionString))
+{
+    connectionString += ";Cache=Shared";
+}
+
 builder.Services.AddDbContext<SqliteContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("SQLiteConnectionString")?.Replace("[DataDirectory]", basePath)));
+    options.UseSqlite(connectionString));
 
 // Регистрация сервисов и репозитория
 builder.Services.AddScoped<IDbRepository, DbRepository>();
@@ -17,6 +23,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPlanService, PlanService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IParserFactory, ParserFactory>();
+builder.Services.AddScoped<IActionLogService, ActionLogService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
 
 // Add Authentication

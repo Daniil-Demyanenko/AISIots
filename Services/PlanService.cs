@@ -1,43 +1,58 @@
 using AISIots.DAL;
 using AISIots.Interfaces;
-using AISIots.Models;
 using AISIots.ViewModels;
+using AISIots.Models;
 using AISIots.Models.DbTables;
 using FuzzySharp;
-using Microsoft.EntityFrameworkCore;
 
 namespace AISIots.Services;
 
-public class PlanService(SqliteContext db, IDbRepository repository) : IPlanService
+public class PlanService(IDbRepository repository) : IPlanService
 {
-    public SearchModel Search(string? searchString, bool isRpdSearch)
+    public async Task<SearchModel> Search(string? searchString, bool isRpdSearch)
     {
         if (string.IsNullOrEmpty(searchString?.Trim()))
         {
-            var result = db.Rpds
-                .OrderByDescending(x => x.UpdateDateTime).Take(50)
-                .Select(x => new SearchItem(x.Id, x.Title));
-            return new SearchModel { Items = result, IsRpdSearch = true };
+            if (isRpdSearch)
+            {
+                var result = (await repository.GetRpdsAsync())
+                    .OrderByDescending(x => x.UpdateDateTime).Take(50)
+                    .Select(x => new SearchItem(x.Id, x.Title)).ToList();
+                return new SearchModel { Items = result, IsRpdSearch = true };
+            }
+            else
+            {
+                var result = (await repository.GetPlansAsync())
+                    .OrderByDescending(x => x.GroupYear).Take(50)
+                    .Select(x => new SearchItem(x.Id, $"{GetFirstPart(x.Code)} - {x.Profile} ({x.GroupYear}, {x.LearningForm}, {x.Level})")).ToList();
+                return new SearchModel { Items = result, IsRpdSearch = false };
+            }
         }
 
-        var select = isRpdSearch
-            ? db.Rpds.Select(x => new SearchItem(x.Id, x.Title))
-            : db.Plans.Select(x => new SearchItem(x.Id, $"{GetFirstPart(x.Code)} - {x.Profile} ({x.GroupYear})"));
+        var rpds = await repository.GetRpdsAsync();
+        var plans = await repository.GetPlansAsync();
 
-        var items = select.AsEnumerable()
-            .OrderByDescending(x => Fuzz.TokenSortRatio(searchString.ToLower(), x.Title.ToLower()))
-            .Take(50);
+        var select = isRpdSearch
+            ? rpds.Select(x => new SearchItem(x.Id, x.Title))
+            : plans.Select(x => new SearchItem(x.Id, $"{GetFirstPart(x.Code)} - {x.Profile} ({x.GroupYear}, {x.LearningForm}, {x.Level})"));
+
+        var items = select.OrderByDescending(x => Fuzz.TokenSortRatio(searchString.ToLower(), x.Title.ToLower()))
+            .Take(50).ToList();
 
         return new SearchModel { Items = items, IsRpdSearch = isRpdSearch };
     }
 
-    public Plan? GetPlanById(int id)
+    public async Task<Plan?> GetPlanByIdAsync(int id)
     {
-        return db.Plans
-            .Include(p => p.PlanBlocks)
-            .ThenInclude(pb => pb.DisciplineSections)
-            .ThenInclude(bs => bs.ShortRpds)
-            .FirstOrDefault(p => p.Id == id);
+        return await repository.GetPlanByIdAsync(id);
+    }
+
+    public async Task<Plan> GetPlanByIdOrThrowAsync(int id)
+    {
+        var plan = await repository.GetPlanByIdAsync(id);
+        if (plan == null)
+            throw new KeyNotFoundException($"План с ID {id} не найден");
+        return plan;
     }
 
     public async Task<string?> UpdateRpdAsync(Rpd rpd)
@@ -45,13 +60,12 @@ public class PlanService(SqliteContext db, IDbRepository repository) : IPlanServ
         if (string.IsNullOrEmpty(rpd.Title?.Trim()))
             return "Поле обязательно для заполнения";
 
-        if (repository.IsContainRpdWithSameTitleDifferentId(rpd.Title, rpd.Id))
+        if (await repository.IsContainRpdWithSameTitleDifferentIdAsync(rpd.Title, rpd.Id))
             return "Такая РПД уже существует";
 
         rpd.UpdateDateTime = DateTime.Now;
-        db.Rpds.Update(rpd);
-        await db.SaveChangesAsync();
-        
+        await repository.UpdateRpdAsync(rpd);
+
         return null;
     }
 
@@ -60,30 +74,38 @@ public class PlanService(SqliteContext db, IDbRepository repository) : IPlanServ
         if (string.IsNullOrEmpty(rpd.Title?.Trim()))
             return "Поле обязательно для заполнения";
 
-        if (await db.Rpds.AnyAsync(r => r.Title.ToLower() == rpd.Title.ToLower()))
+        if (await repository.IsContainRpdWithTitleAsync(rpd.Title))
             return "РПД с таким названием уже существует";
 
         rpd.UpdateDateTime = DateTime.Now;
         rpd.Id = 0;
-        db.Rpds.Add(rpd);
-        await db.SaveChangesAsync();
-        
+        await repository.AddRpdAsync(rpd);
+        await repository.SaveChangesAsync();
+
         return null;
     }
 
     public async Task DeleteRpdAsync(int? id)
     {
-        var rpdToDelete = await db.Rpds.FindAsync(id);
-        if (rpdToDelete is not null) 
-        {
-            db.Rpds.Remove(rpdToDelete);
-            await db.SaveChangesAsync();
-        }
+        await repository.DeleteRpdAsync(id);
+        await repository.SaveChangesAsync();
+    }
+
+    public async Task DeletePlanAsync(int id)
+    {
+        await repository.DeletePlanAsync(id);
+        await repository.SaveChangesAsync();
     }
 
     public async Task<Rpd> FindOrCreateRpdByIdAsync(int? id)
     {
-        var rpd = await db.Rpds.FindAsync(id) ?? (await db.Rpds.AddAsync(new Rpd())).Entity;
+        var rpd = await repository.GetRpdByIdAsync(id);
+        if (rpd == null)
+        {
+            rpd = new Rpd();
+            await repository.AddRpdAsync(rpd);
+        }
+
         return Normalize(rpd);
     }
 
