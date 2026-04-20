@@ -6,5 +6,5 @@ namespace AISIots.Interfaces;
 public interface IReportService
 {
     Task<MissingReportModel> GetMissingRpdsReportAsync();
-    ExportJsonModel GetExportJson();
+    Task<ExportJsonModel> GetExportJsonAsync();
 }
