@@ -6,42 +6,57 @@ using AISIots.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using System.IO;
 
-//TODO: Комментарии к РПД
-//TODO: Вывод информации о Плане -> добавить офо/зфо, очн/заочн
-//TODO: Отчёт -> убрать шифр, исключить дублирование названий
-//TODO: Установка ответственных
-//TODO: Исправить дублирование планов
 namespace AISIots.Controllers;
 
-public class MainController(
-    IPlanService planService,
-    IReportService reportService,
-    IFileProcessingService fileProcessingService,
-    IAuthService authService,
-    IActionLogService logService,
-    IUserService userService) : Controller
+public class MainController : Controller
 {
+    private readonly IPlanService _planService;
+    private readonly IReportService _reportService;
+    private readonly IFileProcessingService _fileProcessingService;
+    private readonly IAuthService _authService;
+    private readonly IActionLogService _logService;
+    private readonly IUserService _userService;
+    private readonly ITemplateGeneratorService _templateGeneratorService;
+    
+    public MainController(
+        IPlanService planService,
+        IReportService reportService,
+        IFileProcessingService fileProcessingService,
+        IAuthService authService,
+        IActionLogService logService,
+        IUserService userService,
+        ITemplateGeneratorService templateGeneratorService)
+    {
+        _planService = planService;
+        _reportService = reportService;
+        _fileProcessingService = fileProcessingService;
+        _authService = authService;
+        _logService = logService;
+        _userService = userService;
+        _templateGeneratorService = templateGeneratorService;
+    }
     [Authorize]
     public async Task<IActionResult> Index(string? searchString = null, bool isRpdSearch = true)
     {
-        return View(await planService.Search(searchString, isRpdSearch));
+        return View(await _planService.Search(searchString, isRpdSearch));
     }
 
     [Authorize]
     public async Task<IActionResult> ImportExport()
     {
-        return View(await reportService.GetExportJsonAsync());
+        return View(await _reportService.GetExportJsonAsync());
     }
 
     [Authorize]
     public async Task<IActionResult> EditRpd(int? id = null)
     {
-        var rpd = await planService.FindOrCreateRpdByIdAsync(id);
+        var rpd = await _planService.FindOrCreateRpdByIdAsync(id);
         if (id.HasValue && rpd.Id == id.Value)
         {
             var userName = User.Identity!.Name;
-            await logService.LogActionAsync(userName!, "Просмотр", "РПД", rpd.Title);
+            await _logService.LogActionAsync(userName!, "Просмотр", "РПД", rpd.Title);
         }
 
         return View(rpd);
@@ -50,16 +65,16 @@ public class MainController(
     [Authorize]
     public async Task<IActionResult> ViewPlan(int id)
     {
-        var plan = await planService.GetPlanByIdOrThrowAsync(id);
+        var plan = await _planService.GetPlanByIdOrThrowAsync(id);
         var userName = User.Identity!.Name;
-        await logService.LogActionAsync(userName!, "Просмотр", "План", plan.Profile);
+        await _logService.LogActionAsync(userName!, "Просмотр", "План", plan.Profile);
         return View(plan);
     }
 
     [HttpPost, Authorize]
     public async Task<IActionResult> CheckSave(Rpd rpd)
     {
-        var errorMessage = await planService.UpdateRpdAsync(rpd);
+        var errorMessage = await _planService.UpdateRpdAsync(rpd);
         if (errorMessage != null)
         {
             if (errorMessage == "Поле обязательно для заполнения")
@@ -72,14 +87,14 @@ public class MainController(
         if (!ModelState.IsValid) return View("EditRpd", rpd);
 
         var userName = User.Identity!.Name;
-        await logService.LogActionAsync(userName!, "Изменение", "РПД", rpd.Title);
+        await _logService.LogActionAsync(userName!, "Изменение", "РПД", rpd.Title);
         return RedirectToAction("Index", new { searchString = rpd.Title, isRpdSearch = true });
     }
 
     [Authorize]
     public async Task<IActionResult> CheckSaveAs(Rpd rpd)
     {
-        var errorMessage = await planService.CreateRpdAsync(rpd);
+        var errorMessage = await _planService.CreateRpdAsync(rpd);
         if (errorMessage != null)
         {
             if (errorMessage == "Поле обязательно для заполнения")
@@ -92,19 +107,19 @@ public class MainController(
         if (!ModelState.IsValid) return View("EditRpd", rpd);
 
         var userName = User.Identity!.Name;
-        await logService.LogActionAsync(userName!, "Создание", "РПД", rpd.Title);
+        await _logService.LogActionAsync(userName!, "Создание", "РПД", rpd.Title);
         return RedirectToAction("Index", new { searchString = rpd.Title, isRpdSearch = true });
     }
 
     [Authorize]
     public async Task<IActionResult> DeleteRdp(int id)
     {
-        var rpd = await planService.FindOrCreateRpdByIdAsync(id);
+        var rpd = await _planService.FindOrCreateRpdByIdAsync(id);
         if (rpd == null) return NotFound();
 
-        await planService.DeleteRpdAsync(id);
+        await _planService.DeleteRpdAsync(id);
         var userName = User.Identity!.Name;
-        await logService.LogActionAsync(userName!, "Удаление", "РПД", rpd.Title);
+        await _logService.LogActionAsync(userName!, "Удаление", "РПД", rpd.Title);
 
         return RedirectToAction("Index", new { isRpdSearch = true });
     }
@@ -112,10 +127,10 @@ public class MainController(
     [Authorize]
     public async Task<IActionResult> DeletePlan(int id)
     {
-        var plan = await planService.GetPlanByIdOrThrowAsync(id);
-        await planService.DeletePlanAsync(id);
+        var plan = await _planService.GetPlanByIdOrThrowAsync(id);
+        await _planService.DeletePlanAsync(id);
         var userName = User.Identity!.Name;
-        await logService.LogActionAsync(userName!, "Удаление", "План", plan.Profile);
+        await _logService.LogActionAsync(userName!, "Удаление", "План", plan.Profile);
         return RedirectToAction("Index", new { isRpdSearch = false });
     }
 
@@ -123,26 +138,58 @@ public class MainController(
     [Authorize]
     public async Task<IActionResult> UploadFiles(List<IFormFile>? files)
     {
-        var excelFiles = await fileProcessingService.ProcessUploadedFilesAsync(files);
+        var excelFiles = await _fileProcessingService.ProcessUploadedFilesAsync(files);
         var userName = User.Identity!.Name;
-        await logService.LogActionAsync(userName!, "Загрузка файлов", "Импорт", $"Файлов: {files?.Count ?? 0}");
+        await _logService.LogActionAsync(userName!, "Загрузка файлов", "Импорт", $"Файлов: {files?.Count ?? 0}");
         return View(excelFiles);
     }
 
     [Authorize]
     public async Task<IActionResult> MissingReport()
     {
-        return View(await reportService.GetMissingRpdsReportAsync());
+        return View(await _reportService.GetMissingRpdsReportAsync());
+    }
+
+    [Authorize]
+    public async Task<IActionResult> DownloadFos(int id)
+    {
+        var rpd = await _planService.FindOrCreateRpdByIdAsync(id);
+        if (rpd == null)
+        {
+            return NotFound();
+        }
+
+        (Stream stream, string fileName) = await _templateGeneratorService.GenerateDocumentAsync(rpd, "fos.docx");
+        var userName = User.Identity!.Name;
+        await _logService.LogActionAsync(userName!, "Скачать ФОС", "РПД", rpd.Title);
+
+        return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
+    }
+
+    [Authorize]
+    public async Task<IActionResult> DownloadRpd(int id)
+    {
+        var rpd = await _planService.FindOrCreateRpdByIdAsync(id);
+        if (rpd == null)
+        {
+            return NotFound();
+        }
+
+        (Stream stream, string fileName) = await _templateGeneratorService.GenerateDocumentAsync(rpd, "rpd.docx");
+        var userName = User.Identity!.Name;
+        await _logService.LogActionAsync(userName!, "Скачать РПД", "РПД", rpd.Title);
+
+        return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
     }
 
     [AllowAnonymous]
     public async Task<IActionResult> Login(string? login, string? password, string? confirmPassword)
     {
-        var model = await authService.ProcessLogin(login, password, confirmPassword);
+        var model = await _authService.ProcessLogin(login, password, confirmPassword);
 
         if (!model.SuccessAuth) return View(model);
 
-        var userPrincipal = authService.CreatePrincipal(login!);
+        var userPrincipal = _authService.CreatePrincipal(login!);
 
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
@@ -153,7 +200,7 @@ public class MainController(
                 ExpiresUtc = DateTime.UtcNow.AddDays(3)
             });
 
-        await logService.LogActionAsync(login!, "Вход", "Сессия", "Успешный вход");
+        await _logService.LogActionAsync(login!, "Вход", "Сессия", "Успешный вход");
 
         return RedirectToAction("Index", "Main");
     }
@@ -174,7 +221,7 @@ public class MainController(
     public async Task<IActionResult> ChangeUserRole(string login, int newRoleId)
     {
         var userName = User.Identity!.Name;
-        await userService.ChangeUserRoleAsync(login, newRoleId, userName!);
+        await _userService.ChangeUserRoleAsync(login, newRoleId, userName!);
         return RedirectToAction("Settings", new { message = $"Роль пользователя {login} изменена" });
     }
 
@@ -182,9 +229,9 @@ public class MainController(
     public async Task<IActionResult> Settings(string? message = null, int page = 1)
     {
         var userName = User.Identity!.Name;
-        var currentUserRole = await authService.GetUserRole(userName!);
+        var currentUserRole = await _authService.GetUserRole(userName!);
         var isAdmin = currentUserRole == "MainAdmin" || currentUserRole == "Admin";
-        const int pageSize = 25;
+        const int pageSize = 20;
 
         var model = new SettingsModel
         {
@@ -196,18 +243,16 @@ public class MainController(
 
         if (isAdmin)
         {
-            model.Users = await userService.GetAllUsersAsync(userName!);
-            var allLogs = await logService.GetLogsAsync();
-            model.Logs = allLogs;
-            model.TotalPages = (int)Math.Ceiling(allLogs.Count / (double)pageSize);
-            model.LogsPage = allLogs.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            model.Users = await _userService.GetAllUsersAsync(userName!);
+            int totalLogs = await _logService.GetLogsCountAsync();
+            model.TotalPages = (int)Math.Ceiling(totalLogs / (double)pageSize);
+            model.LogsPage = await _logService.GetLogsAsync(page, pageSize);
         }
         else
         {
-            var allLogs = await logService.GetLogsByUserAsync(userName!);
-            model.Logs = allLogs;
-            model.TotalPages = (int)Math.Ceiling(allLogs.Count / (double)pageSize);
-            model.LogsPage = allLogs.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            int totalLogs = await _logService.GetLogsCountByUserAsync(userName!);
+            model.TotalPages = (int)Math.Ceiling(totalLogs / (double)pageSize);
+            model.LogsPage = await _logService.GetLogsByUserAsync(userName!, page, pageSize);
         }
 
         if (!string.IsNullOrEmpty(message))
@@ -239,13 +284,13 @@ public class MainController(
             return RedirectToAction("Settings", new { message = "Пароли не совпадают" });
         }
 
-        var success = await userService.ChangePasswordAsync(userName!, oldPassword, newPassword);
+        var success = await _userService.ChangePasswordAsync(userName!, oldPassword, newPassword);
         if (!success)
         {
             return RedirectToAction("Settings", new { message = "Неверный текущий пароль" });
         }
 
-        await logService.LogActionAsync(userName!, "Смена пароля", "Пользователь", userName!);
+        await _logService.LogActionAsync(userName!, "Смена пароля", "Пользователь", userName!);
         return RedirectToAction("Settings", new { message = "Пароль успешно изменён" });
     }
 }

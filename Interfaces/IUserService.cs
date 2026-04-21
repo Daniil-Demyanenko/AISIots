@@ -10,7 +10,7 @@ public interface IUserService
     Task ChangeUserRoleAsync(string login, int newRoleId, string changedBy);
     Task ChangeUserPasswordAsync(string login, string newPassword, string changedBy);
     Task DeleteUserAsync(string login, string deletedBy);
-    bool CanChangeRoleAsync(string login);
-    bool CanDeleteUser(string login);
-    bool CanEditUser(string targetLogin, string currentUserLogin);
+    Task<bool> CanChangeRoleAsync(string targetLogin, string currentUserLogin);
+    Task<bool> CanDeleteUser(string targetLogin, string currentUserLogin);
+    Task<bool> CanEditUser(string targetLogin, string currentUserLogin);
 }

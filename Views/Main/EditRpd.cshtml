@@ -121,9 +121,12 @@
             Сохранить как
         </button>
         <button type="submit" class="btn btn-danger text-white" asp-action="DeleteRdp" asp-controller="Main"
-                method="post" title="Удалит открытую сейчас РПД">
+                method="post" title="Удалит открытую сейчас РПД"
+                onclick="return confirm('Вы действительно хотите удалить этот РПД?');">
             Удалить
         </button>
+        <a asp-action="DownloadFos" asp-controller="Main" asp-route-id="@Model.Id" class="btn btn-success">Скачать ФОС</a>
+        <a asp-action="DownloadRpd" asp-controller="Main" asp-route-id="@Model.Id" class="btn btn-success">Скачать РПД</a>
     </div>
 </form>
 

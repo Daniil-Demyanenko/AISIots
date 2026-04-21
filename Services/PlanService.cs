@@ -100,11 +100,10 @@ public class PlanService(IDbRepository repository) : IPlanService
     public async Task<Rpd> FindOrCreateRpdByIdAsync(int? id)
     {
         var rpd = await repository.GetRpdByIdAsync(id);
-        if (rpd == null)
-        {
-            rpd = new Rpd();
-            await repository.AddRpdAsync(rpd);
-        }
+        if (rpd != null) return Normalize(rpd);
+        
+        rpd = new Rpd();
+        await repository.AddRpdAsync(rpd);
 
         return Normalize(rpd);
     }

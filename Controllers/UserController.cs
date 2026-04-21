@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using AISIots.Interfaces;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AISIots.Controllers;
 
@@ -50,7 +51,7 @@ public class UserController(
         }
 
         var currentUser = User.Identity!.Name;
-        if (!userService.CanEditUser(login, currentUser!))
+        if (!await userService.CanEditUser(login, currentUser!))
         {
             return RedirectToAction("Settings", "Main", new { message = "Нельзя редактировать этого пользователя" });
         }
@@ -63,12 +64,19 @@ public class UserController(
     public async Task<IActionResult> DeleteUser(string login)
     {
         var currentUser = User.Identity!.Name;
-        if (!userService.CanEditUser(login, currentUser!))
+        if (!await userService.CanEditUser(login, currentUser!))
         {
             return RedirectToAction("Settings", "Main", new { message = "Нельзя удалить этого пользователя" });
         }
 
         await userService.DeleteUserAsync(login, currentUser!);
+
+        if (login == currentUser)
+        {
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("Login", "Main", new { message = "Ваша учётная запись была удалена" });
+        }
+
         return RedirectToAction("Settings", "Main", new { message = $"Пользователь {login} удалён" });
     }
 }

@@ -1,6 +1,7 @@
 using AISIots.DAL;
 using AISIots.Interfaces;
 using AISIots.Services;
+using AISIots.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IParserFactory, ParserFactory>();
 builder.Services.AddScoped<IActionLogService, ActionLogService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFileProcessingService, FileProcessingService>();
+builder.Services.AddScoped<ITemplateGeneratorService, TemplateGeneratorService>();
 
 // Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -56,6 +58,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseUserExistenceCheck();
 app.UseAuthorization();
 
 

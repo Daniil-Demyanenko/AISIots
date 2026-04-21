@@ -15,7 +15,7 @@ public class UserService(IDbRepository repository, IActionLogService logService)
         var result = new List<UserViewModel>();
         foreach (var u in users)
         {
-            var isEditable = CanEditUser(u.Login, currentUserLogin);
+            var isEditable = await CanEditUser(u.Login, currentUserLogin);
             result.Add(new UserViewModel
             {
                 Login = u.Login,
@@ -59,52 +59,96 @@ public class UserService(IDbRepository repository, IActionLogService logService)
 
     public async Task ChangeUserRoleAsync(string login, int newRoleId, string changedBy)
     {
-        var user = await repository.GetUserByLoginAsync(login);
-        if (user == null || user.RoleId == 1) return;
+        var targetUser = await repository.GetUserByLoginAsync(login);
+        var currentUser = await repository.GetUserByLoginAsync(changedBy);
 
-        user.RoleId = newRoleId;
-        await repository.UpdateUserAsync(user);
+        if (targetUser == null || currentUser == null) return;
+
+        if (!await CanChangeRoleInternal(targetUser, currentUser))
+            throw new InvalidOperationException("Недостаточно прав для изменения роли или пользователь защищен");
+
+        targetUser.RoleId = newRoleId;
+        await repository.UpdateUserAsync(targetUser);
 
         await logService.LogActionAsync(changedBy, "Изменение роли", "Пользователь", login);
     }
 
-    public bool CanChangeRoleAsync(string login)
+    public async Task<bool> CanChangeRoleAsync(string targetLogin, string currentUserLogin)
     {
-        //- This method should ideally be async, but for simplicity in UI we use sync checks
-        // In a real app, we'd use a cached user or pass the role in.
-        return true;
+        var targetUser = await repository.GetUserByLoginAsync(targetLogin);
+        var currentUser = await repository.GetUserByLoginAsync(currentUserLogin);
+        return await CanChangeRoleInternal(targetUser, currentUser);
+    }
+
+    private Task<bool> CanChangeRoleInternal(User? targetUser, User? currentUser)
+    {
+        if (targetUser == null || currentUser == null) return Task.FromResult(false);
+        if (targetUser.RoleId == 1) return Task.FromResult(false);
+        if (currentUser.RoleId == 1) return Task.FromResult(true);
+        if (currentUser.RoleId == 2 && targetUser.RoleId != 2) return Task.FromResult(true);
+        return Task.FromResult(false);
     }
 
     public async Task ChangeUserPasswordAsync(string login, string newPassword, string changedBy)
     {
-        var user = await repository.GetUserByLoginAsync(login);
-        if (user == null) return;
+        var targetUser = await repository.GetUserByLoginAsync(login);
+        var currentUser = await repository.GetUserByLoginAsync(changedBy);
+
+        if (!await CanEditUserInternal(targetUser, currentUser))
+            throw new InvalidOperationException("Недостаточно прав для изменения пароля");
 
         using SHA256 sha = SHA256.Create();
-        user.Password = sha.ComputeHash(Encoding.ASCII.GetBytes(newPassword));
-        await repository.UpdateUserAsync(user);
+        targetUser!.Password = sha.ComputeHash(Encoding.ASCII.GetBytes(newPassword));
+        await repository.UpdateUserAsync(targetUser);
 
         await logService.LogActionAsync(changedBy, "Смена пароля", "Пользователь", login);
     }
 
     public async Task DeleteUserAsync(string login, string deletedBy)
     {
-        var user = await repository.GetUserByLoginAsync(login);
-        if (user == null || user.RoleId == 1) return;
+        var targetUser = await repository.GetUserByLoginAsync(login);
+        var currentUser = await repository.GetUserByLoginAsync(deletedBy);
+
+        if (!await CanDeleteUserInternal(targetUser, currentUser))
+            throw new InvalidOperationException("Недостаточно прав для удаления пользователя");
 
         await logService.LogActionAsync(deletedBy, "Удаление", "Пользователь", login);
         await repository.DeleteUserAsync(login);
     }
 
-    public bool CanDeleteUser(string login)
+    public async Task<bool> CanDeleteUser(string targetLogin, string currentUserLogin)
     {
-        return true;
+        var targetUser = await repository.GetUserByLoginAsync(targetLogin);
+        var currentUser = await repository.GetUserByLoginAsync(currentUserLogin);
+        return await CanDeleteUserInternal(targetUser, currentUser);
     }
 
-    public bool CanEditUser(string targetLogin, string currentUserLogin)
+    private Task<bool> CanDeleteUserInternal(User? targetUser, User? currentUser)
     {
-        // We can't easily make this sync without a cached user, so we assume 
-        // that the logic is handled by the Admin role in the controller
-        return true;
+        if (targetUser == null || currentUser == null) return Task.FromResult(false);
+        if (targetUser.RoleId == 1) return Task.FromResult(false);
+        if (currentUser.RoleId == 1) return Task.FromResult(true);
+        if (currentUser.RoleId == 2 && targetUser.RoleId != 2) return Task.FromResult(true);
+        return Task.FromResult(false);
+    }
+
+    public async Task<bool> CanEditUser(string targetLogin, string currentUserLogin)
+    {
+        var targetUser = await repository.GetUserByLoginAsync(targetLogin);
+        var currentUser = await repository.GetUserByLoginAsync(currentUserLogin);
+        return await CanEditUserInternal(targetUser, currentUser);
+    }
+
+    private Task<bool> CanEditUserInternal(User? targetUser, User? currentUser)
+    {
+        if (targetUser == null || currentUser == null) return Task.FromResult(false);
+        if (currentUser.RoleId == 1) return Task.FromResult(true);
+        if (currentUser.RoleId == 2)
+        {
+            if (targetUser.RoleId == 3) return Task.FromResult(true);
+            if (targetUser.Login == currentUser.Login) return Task.FromResult(true);
+        }
+        if (targetUser.Login == currentUser.Login) return Task.FromResult(true);
+        return Task.FromResult(false);
     }
 }

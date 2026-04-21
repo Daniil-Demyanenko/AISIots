@@ -57,11 +57,12 @@ public class PlanParser : IExcelParser<Plan>
                 for (int itemRow = sectionRow + 1; itemRow < lastRow; itemRow++) // создание записей в каждой секции
                 {
                     cell = _wsPlan.Cell(itemRow, 1);
-                    if (cell.IsMerged()) break;
+                    if (cell.IsMerged()) break; // закончилась текущая секция с дисциплинами
 
                     var index = _wsPlan.Cell(itemRow, 2).Value.ToString().Trim();
                     var discipline = _wsPlan.Cell(itemRow, 3).Value.ToString().Trim();
 
+                    if (discipline.Contains("Дисциплины (модули)") || discipline.Contains("Элективные дисциплины по физической")) continue;
                     planBloks.Last().DisciplineSections.Last().ShortRpds.Add(new ShortRpd(discipline, index));
                 }
             }
@@ -73,8 +74,13 @@ public class PlanParser : IExcelParser<Plan>
     private int GetGroupYear()
     {
         var (foundRow, foundCol) = (0, 0);
-        int lastRow = _wsTitle.LastRowUsed()!.RowNumber();
-        int lastCol = _wsTitle.LastColumnUsed().ColumnNumber();
+        var lastRowCell = _wsTitle.LastRowUsed();
+        var lastColCell = _wsTitle.LastColumnUsed();
+        
+        if (lastRowCell == null || lastColCell == null) return -1;
+
+        int lastRow = lastRowCell.RowNumber();
+        int lastCol = lastColCell.ColumnNumber();
 
         for (int row = 1; row <= lastRow; row++)
         {
