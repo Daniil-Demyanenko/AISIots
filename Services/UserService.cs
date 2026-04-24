@@ -83,10 +83,7 @@ public class UserService(IDbRepository repository, IActionLogService logService)
     private Task<bool> CanChangeRoleInternal(User? targetUser, User? currentUser)
     {
         if (targetUser == null || currentUser == null) return Task.FromResult(false);
-        if (targetUser.RoleId == 1) return Task.FromResult(false);
-        if (currentUser.RoleId == 1) return Task.FromResult(true);
-        if (currentUser.RoleId == 2 && targetUser.RoleId != 2) return Task.FromResult(true);
-        return Task.FromResult(false);
+        return Task.FromResult(targetUser.RoleId != 1 && currentUser.RoleId is 1 or 2);
     }
 
     public async Task ChangeUserPasswordAsync(string login, string newPassword, string changedBy)
@@ -125,11 +122,8 @@ public class UserService(IDbRepository repository, IActionLogService logService)
 
     private Task<bool> CanDeleteUserInternal(User? targetUser, User? currentUser)
     {
-        if (targetUser == null || currentUser == null) return Task.FromResult(false);
-        if (targetUser.RoleId == 1) return Task.FromResult(false);
-        if (currentUser.RoleId == 1) return Task.FromResult(true);
-        if (currentUser.RoleId == 2 && targetUser.RoleId != 2) return Task.FromResult(true);
-        return Task.FromResult(false);
+        if (targetUser == null || currentUser == null || targetUser.RoleId == 1) return Task.FromResult(false);
+        return Task.FromResult(currentUser.RoleId is 1 or 2);
     }
 
     public async Task<bool> CanEditUser(string targetLogin, string currentUserLogin)
@@ -142,13 +136,9 @@ public class UserService(IDbRepository repository, IActionLogService logService)
     private Task<bool> CanEditUserInternal(User? targetUser, User? currentUser)
     {
         if (targetUser == null || currentUser == null) return Task.FromResult(false);
-        if (currentUser.RoleId == 1) return Task.FromResult(true);
-        if (currentUser.RoleId == 2)
-        {
-            if (targetUser.RoleId == 3) return Task.FromResult(true);
-            if (targetUser.Login == currentUser.Login) return Task.FromResult(true);
-        }
-        if (targetUser.Login == currentUser.Login) return Task.FromResult(true);
-        return Task.FromResult(false);
+        if (currentUser.RoleId == 1 || currentUser.RoleId == 2 && targetUser.RoleId != 1) 
+            return Task.FromResult(true);
+        
+        return Task.FromResult(targetUser.Login == currentUser.Login);
     }
 }
