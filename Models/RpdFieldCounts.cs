@@ -13,4 +13,13 @@ public static class RpdFieldCounts
     public static readonly int KursRab = 10;
     public static readonly int Fos = 20;
     public static readonly int FosItog = 20;
+    public static readonly int Komp = 3;
+    public static readonly int Xl = 16;
+    public static readonly int Xlzo = 16;
+    public static readonly int Zl = 20;
+    public static readonly int Zlzo = 20;
+    public static readonly int Yl = 20;
+    public static readonly int Ylzo = 20;
+    public static readonly int Nnsr = 5;
+    public static readonly int Wnsr = 5;
 }

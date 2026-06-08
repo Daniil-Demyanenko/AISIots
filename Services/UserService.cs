@@ -136,9 +136,9 @@ public class UserService(IDbRepository repository, IActionLogService logService)
     private Task<bool> CanEditUserInternal(User? targetUser, User? currentUser)
     {
         if (targetUser == null || currentUser == null) return Task.FromResult(false);
-        if (currentUser.RoleId == 1 || currentUser.RoleId == 2 && targetUser.RoleId != 1) 
+        if (currentUser.RoleId == 1 || currentUser.RoleId == 2 && targetUser.RoleId != 1)
             return Task.FromResult(true);
-        
+
         return Task.FromResult(targetUser.Login == currentUser.Login);
     }
 }

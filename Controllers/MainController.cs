@@ -19,7 +19,7 @@ public class MainController : Controller
     private readonly IActionLogService _logService;
     private readonly IUserService _userService;
     private readonly ITemplateGeneratorService _templateGeneratorService;
-    
+
     public MainController(
         IPlanService planService,
         IReportService reportService,
@@ -37,6 +37,7 @@ public class MainController : Controller
         _userService = userService;
         _templateGeneratorService = templateGeneratorService;
     }
+
     [Authorize]
     public async Task<IActionResult> Index(string? searchString = null, bool isRpdSearch = true)
     {
@@ -170,14 +171,24 @@ public class MainController : Controller
     public async Task<IActionResult> DownloadRpd(int id)
     {
         var rpd = await _planService.FindOrCreateRpdByIdAsync(id);
-        if (rpd == null)
-        {
-            return NotFound();
-        }
+        if (rpd == null) return NotFound();
 
         (Stream stream, string fileName) = await _templateGeneratorService.GenerateDocumentAsync(rpd, "rpd.docx");
         var userName = User.Identity!.Name;
         await _logService.LogActionAsync(userName!, "Скачать РПД", "РПД", rpd.Title);
+
+        return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
+    }
+
+    [Authorize]
+    public async Task<IActionResult> DownloadAnn(int id)
+    {
+        var rpd = await _planService.FindOrCreateRpdByIdAsync(id);
+        if (rpd == null) return NotFound();
+
+        (Stream stream, string fileName) = await _templateGeneratorService.GenerateDocumentAsync(rpd, "ann.docx");
+        var userName = User.Identity!.Name;
+        await _logService.LogActionAsync(userName!, "Скачать аннотацию", "РПД", rpd.Title);
 
         return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
     }

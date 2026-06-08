@@ -101,14 +101,14 @@ public class PlanService(IDbRepository repository) : IPlanService
     {
         var rpd = await repository.GetRpdByIdAsync(id);
         if (rpd != null) return Normalize(rpd);
-        
+
         rpd = new Rpd();
         await repository.AddRpdAsync(rpd);
 
         return Normalize(rpd);
     }
 
-    private Rpd Normalize(Rpd rpd)
+    private static Rpd Normalize(Rpd rpd)
     {
         for (int i = rpd.Zad.Count; i < RpdFieldCounts.Zad; i++) rpd.Zad.Add("");
         for (int i = rpd.Nlec.Count; i < RpdFieldCounts.Nlec; i++) rpd.Nlec.Add("");
@@ -121,6 +121,15 @@ public class PlanService(IDbRepository repository) : IPlanService
         for (int i = rpd.KursRab.Count; i < RpdFieldCounts.KursRab; i++) rpd.KursRab.Add("");
         for (int i = rpd.Fos.Count; i < RpdFieldCounts.Fos; i++) rpd.Fos.Add("");
         for (int i = rpd.FosItog.Count; i < RpdFieldCounts.FosItog; i++) rpd.FosItog.Add("");
+        for (int i = rpd.Komp.Count; i < RpdFieldCounts.Komp; i++) rpd.Komp.Add("");
+        for (int i = rpd.Xl.Count; i < RpdFieldCounts.Xl; i++) rpd.Xl.Add(0);
+        for (int i = rpd.Xlzo.Count; i < RpdFieldCounts.Xlzo; i++) rpd.Xlzo.Add(0);
+        for (int i = rpd.Zl.Count; i < RpdFieldCounts.Zl; i++) rpd.Zl.Add(0);
+        for (int i = rpd.Zlzo.Count; i < RpdFieldCounts.Zlzo; i++) rpd.Zlzo.Add(0);
+        for (int i = rpd.Yl.Count; i < RpdFieldCounts.Yl; i++) rpd.Yl.Add(0);
+        for (int i = rpd.Ylzo.Count; i < RpdFieldCounts.Ylzo; i++) rpd.Ylzo.Add(0);
+        for (int i = rpd.Nnsr.Count; i < RpdFieldCounts.Nnsr; i++) rpd.Nnsr.Add(0);
+        for (int i = rpd.Wnsr.Count; i < RpdFieldCounts.Wnsr; i++) rpd.Wnsr.Add(0);
 
         return rpd;
     }

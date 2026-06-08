@@ -47,7 +47,8 @@ namespace AISIots.Services
             {
                 { nameof(Rpd.Fos), "fosb" },
                 { nameof(Rpd.FosItog), "fositog" },
-                { nameof(Rpd.DopProgObesp), "dopprogrobesp" }
+                { nameof(Rpd.DopProgObesp), "dopprogrobesp" },
+                { nameof(Rpd.Title), "disc1" }
             };
 
             var properties = typeof(Rpd).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -61,13 +62,26 @@ namespace AISIots.Services
 
                 AddPropertyReplacements(replacements, rpd, prop, baseKey);
             }
+
+            AddComputedTotals(replacements, rpd);
+
             return replacements;
+        }
+
+        private static void AddComputedTotals(Dictionary<string, string> replacements, Rpd rpd)
+        {
+            replacements["{{lec1}}"] = rpd.Xl.Sum().ToString();
+            replacements["{{leczo1}}"] = rpd.Xlzo.Sum().ToString();
+            replacements["{{pract1}}"] = rpd.Zl.Sum().ToString();
+            replacements["{{practzo1}}"] = rpd.Zlzo.Sum().ToString();
+            replacements["{{lab1}}"] = rpd.Yl.Sum().ToString();
+            replacements["{{labzo1}}"] = rpd.Ylzo.Sum().ToString();
         }
 
         private bool IsIgnoredProperty(string propName) => 
             propName is nameof(Rpd.Id) or nameof(Rpd.UpdateDateTime) or nameof(Rpd.IsDeleted) or nameof(Rpd.GetFormatedDateTime);
 
-        private void AddPropertyReplacements(Dictionary<string, string> replacements, Rpd rpd, PropertyInfo prop, string baseKey)
+        private static void AddPropertyReplacements(Dictionary<string, string> replacements, Rpd rpd, PropertyInfo prop, string baseKey)
         {
             if (prop.PropertyType == typeof(string))
             {
@@ -82,6 +96,16 @@ namespace AISIots.Services
                 for (int i = 0; i < list.Count; i++)
                 {
                     replacements[$"{{{{{baseKey}{i + 1}}}}}"] = list[i] ?? string.Empty;
+                }
+            }
+            else if (prop.PropertyType == typeof(List<int>))
+            {
+                var list = (List<int>?)prop.GetValue(rpd);
+                if (list == null) return;
+
+                for (int i = 0; i < list.Count; i++)
+                {
+                    replacements[$"{{{{{baseKey}{i + 1}}}}}"] = list[i].ToString();
                 }
             }
         }
@@ -220,9 +244,11 @@ namespace AISIots.Services
             return -1;
         }
 
-        private string GenerateFileName(Rpd rpd, string templateName)
+        private static string GenerateFileName(Rpd rpd, string templateName)
         {
-            string prefix = templateName.StartsWith("fos", StringComparison.OrdinalIgnoreCase) ? "ФОС" : "РПД";
+            string prefix = templateName.StartsWith("fos", StringComparison.OrdinalIgnoreCase) ? "ФОС"
+                : templateName.StartsWith("ann", StringComparison.OrdinalIgnoreCase) ? "Аннотация"
+                : "РПД";
             var safeTitle = Regex.Replace(rpd.Title, @"[<>:""\/\\|?*]+", "_");
             if (string.IsNullOrWhiteSpace(safeTitle))
                 safeTitle = "document";

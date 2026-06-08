@@ -7,74 +7,182 @@
 <p>Дата последнего редактирования: @Model.GetFormatedDateTime()</p>
 
 <form asp-action="CheckSave" asp-controller="Main" method="post">
-    <!-- Поля ввода для обычных свойств модели Rpd -->
     <div class="form-group">
         <label asp-for="Title">Название:</label>
         <input asp-for="Title" value="@Model.Title" class="form-control"/>
         <span asp-validation-for="Title" class="text-danger"></span><br/>
 
+        <label asp-for="Fak">Факультет:</label>
+        <input asp-for="Fak" class="form-control"/>
+
+        <label asp-for="FakShort">Факультет (сокращённо):</label>
+        <input asp-for="FakShort" class="form-control"/>
+
+        <label asp-for="Kaf">Кафедра:</label>
+        <input asp-for="Kaf" class="form-control"/>
+
+        <label asp-for="KodKaf">Кафедра (сокращённо):</label>
+        <input asp-for="KodKaf" class="form-control"/>
+
+        <label asp-for="KodSpec">Код специальности:</label>
+        <input asp-for="KodSpec" class="form-control"/>
+
+        <label asp-for="Spec">Специальность:</label>
+        <input asp-for="Spec" class="form-control"/>
+
+        <label asp-for="Profil">Профиль подготовки:</label>
+        <input asp-for="Profil" class="form-control"/>
+
+        <label asp-for="Kvalif">Квалификация:</label>
+        <input asp-for="Kvalif" class="form-control"/>
+
+        <label asp-for="FormaObuch">Форма обучения:</label>
+        <input asp-for="FormaObuch" class="form-control"/>
+
+        <label asp-for="Sem">Курс обучения:</label>
+        <input asp-for="Sem" class="form-control"/>
+
+        <label asp-for="ZavKaf">Заведующий кафедрой:</label>
+        <input asp-for="ZavKaf" class="form-control"/>
+
+        <label asp-for="DirFio">Директор (ФИО):</label>
+        <input asp-for="DirFio" class="form-control"/>
+
+        <label asp-for="Standart">Стандарт обучения:</label>
+        <input asp-for="Standart" class="form-control"/>
+
+        <label asp-for="Chast">Часть учебного плана:</label>
+        <input asp-for="Chast" class="form-control"/>
+
+        <label asp-for="KodDisc">Код дисциплины:</label>
+        <input asp-for="KodDisc" class="form-control"/>
+
+        <label asp-for="Itogo">Общая учебная нагрузка (з.е.):</label>
+        <input asp-for="Itogo" class="form-control"/>
+
+        <label asp-for="Ze">Объём часов (з.е.):</label>
+        <input asp-for="Ze" class="form-control"/>
+
+        <label asp-for="SemShort">Семестр изучения:</label>
+        <input asp-for="SemShort" class="form-control"/>
+
+        <label asp-for="FormaKontrol11">Форма аттестации:</label>
+        <input asp-for="FormaKontrol11" class="form-control"/>
+
+        <label asp-for="Ksr">Другие формы контроля (очная, ч.):</label>
+        <input asp-for="Ksr" class="form-control"/>
+
+        <label asp-for="KsrZo">Другие формы контроля (заочная, ч.):</label>
+        <input asp-for="KsrZo" class="form-control"/>
+
+        <label asp-for="SamRab">Самостоятельная работа (очная, з.е.):</label>
+        <input asp-for="SamRab" class="form-control"/>
+
+        <label asp-for="SamRabZo">Самостоятельная работа (заочная, з.е.):</label>
+        <input asp-for="SamRabZo" class="form-control"/>
+
+        <label asp-for="FosKomp">Компетенции (строка):</label>
+        <input asp-for="FosKomp" class="form-control"/>
+
+        <label asp-for="TekKontrol">Текущий контроль:</label>
+        <input asp-for="TekKontrol" class="form-control"/>
+
+        <label asp-for="FosFormaKontrol">Форма промежуточной аттестации:</label>
+        <input asp-for="FosFormaKontrol" class="form-control"/>
+
+        <label asp-for="UmkPreds">Председатель УМК:</label>
+        <input asp-for="UmkPreds" class="form-control"/>
+
+        <label asp-for="ProtUmk">Одобрено УМК:</label>
+        <input asp-for="ProtUmk" class="form-control"/>
+
+        <label asp-for="ProtKaf">Утверждена кафедрой:</label>
+        <input asp-for="ProtKaf" class="form-control"/>
+
         <label asp-for="PrepodRegFull">Регалии преподавателя:</label>
-        <input asp-for="PrepodRegFull" value="@Model.PrepodRegFull" class="form-control"/>
+        <input asp-for="PrepodRegFull" class="form-control"/>
 
         <label asp-for="PrepodRegFullShort">Регалии преподавателя (коротко):</label>
-        <input asp-for="PrepodRegFullShort" value="@Model.PrepodRegFullShort" class="form-control"/>
+        <input asp-for="PrepodRegFullShort" class="form-control"/>
 
         <label asp-for="Razrab">Разработчик:</label>
-        <input asp-for="Razrab" value="@Model.Razrab" class="form-control"/>
+        <input asp-for="Razrab" class="form-control"/>
 
         <label asp-for="RazrabShort">Разработчик (коротко):</label>
-        <input asp-for="RazrabShort" value="@Model.RazrabShort" class="form-control"/>
+        <input asp-for="RazrabShort" class="form-control"/>
 
         <label asp-for="Tceli">Цели:</label>
-        <textarea asp-for="Tceli" class="form-control">@Model.Tceli</textarea>
+        <textarea asp-for="Tceli" class="form-control"></textarea>
 
         <label asp-for="Znat">Знать:</label>
-        <input asp-for="Znat" value="@Model.Znat" class="form-control"/>
+        <input asp-for="Znat" class="form-control"/>
 
         <label asp-for="Umet">Уметь:</label>
-        <input asp-for="Umet" value="@Model.Umet" class="form-control"/>
+        <input asp-for="Umet" class="form-control"/>
 
         <label asp-for="Vladet">Владеть:</label>
-        <input asp-for="Vladet" value="@Model.Vladet" class="form-control"/>
+        <input asp-for="Vladet" class="form-control"/>
 
         <label asp-for="DopProgObesp">Дополнительное программное обеспечение:</label>
-        <input asp-for="DopProgObesp" value="@Model.DopProgObesp" class="form-control"/>
+        <input asp-for="DopProgObesp" class="form-control"/>
 
         <label asp-for="Osnna">Основывается на:</label>
-        <input asp-for="Osnna" value="@Model.Osnna" class="form-control"/>
+        <input asp-for="Osnna" class="form-control"/>
 
         <label asp-for="Sldla">Служит для:</label>
-        <input asp-for="Sldla" value="@Model.Sldla" class="form-control"/>
+        <input asp-for="Sldla" class="form-control"/>
     </div>
-    <!-- Поля ввода для списков строк -->
+
+    <h4>Компетенции</h4>
+    <table class="comp-table">
+        <thead>
+        <tr>
+            <th>Название компетенции</th>
+            <th>Код по ФГОС ВО</th>
+            <th>Индикатор достижения</th>
+            <th>Результаты обучения</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><textarea name="Komp"
+                          class="form-control form-control-sm">@(Model.Komp.Count > 0 ? Model.Komp[0] : "")</textarea>
+            </td>
+            <td><input name="Komp1n" class="form-control form-control-sm" value="@Model.Komp1n"/></td>
+            <td><textarea name="Komp1N123" class="form-control form-control-sm">@Model.Komp1N123</textarea></td>
+            <td><textarea name="Komp1N123Et" class="form-control form-control-sm">@Model.Komp1N123Et</textarea></td>
+        </tr>
+        <tr>
+            <td><textarea name="Komp"
+                          class="form-control form-control-sm">@(Model.Komp.Count > 1 ? Model.Komp[1] : "")</textarea>
+            </td>
+            <td><input name="Komp2n" class="form-control form-control-sm" value="@Model.Komp2n"/></td>
+            <td><textarea name="Komp2N123" class="form-control form-control-sm">@Model.Komp2N123</textarea></td>
+            <td><textarea name="Komp2N123Et" class="form-control form-control-sm">@Model.Komp2N123Et</textarea></td>
+        </tr>
+        <tr>
+            <td><textarea name="Komp"
+                          class="form-control form-control-sm">@(Model.Komp.Count > 2 ? Model.Komp[2] : "")</textarea>
+            </td>
+            <td><input name="Komp3n" class="form-control form-control-sm" value="@Model.Komp3n"/></td>
+            <td><textarea name="Komp3N123" class="form-control form-control-sm">@Model.Komp3N123</textarea></td>
+            <td><textarea name="Komp3N123Et" class="form-control form-control-sm">@Model.Komp3N123Et</textarea></td>
+        </tr>
+        </tbody>
+    </table>
+
+    @{ RenderTopicTable("Лекции", Model.Nlec, Model.Xl, Model.Xlzo, "Nlec", "Xl", "Xlzo", "lec-total"); }
+
+    @{ RenderTopicTable("Практические", Model.Npract, Model.Zl, Model.Zlzo, "Npract", "Zl", "Zlzo", "pract-total"); }
+
+    @{ RenderTopicTable("Лабораторные", Model.Nlab, Model.Yl, Model.Ylzo, "Nlab", "Yl", "Ylzo", "lab-total"); }
+
+    @{ RenderTopicTable("Самостоятельные", Model.Nsr, Model.Nnsr, Model.Wnsr, "Nsr", "Nnsr", "Wnsr", "sr-total"); }
+
     <h4>Задания:</h4>
     @foreach (var i in Model.Zad)
     {
         <textarea name="Zad" class="form-control">@i</textarea>
-    }
-
-    <h4>Лекции</h4>
-    @foreach (var i in Model.Nlec)
-    {
-        <textarea name="Nlec" class="form-control">@i</textarea>
-    }
-
-    <h4>Практические</h4>
-    @foreach (var i in Model.Npract)
-    {
-        <textarea name="Npract" class="form-control">@i</textarea>
-    }
-
-    <h4>Лабораторные</h4>
-    @foreach (var i in Model.Nlab)
-    {
-        <textarea name="Nlab" class="form-control">@i</textarea>
-    }
-
-    <h4>Самостоятельные</h4>
-    @foreach (var i in Model.Nsr)
-    {
-        <textarea name="Nsr" class="form-control">@i</textarea>
     }
 
     <h4>Курсовые</h4>
@@ -92,13 +200,13 @@
     <h4>Дополнительная литература</h4>
     @foreach (var i in Model.DopLitra)
     {
-        <textarea name="LecAnnotir" class="form-control">@i</textarea>
+        <textarea name="DopLitra" class="form-control">@i</textarea>
     }
 
     <h4>Аннотированные лекции</h4>
     @foreach (var i in Model.LecAnnotir)
     {
-        <textarea name="Nsr" class="form-control">@i</textarea>
+        <textarea name="LecAnnotir" class="form-control">@i</textarea>
     }
 
     <h4>ФОС</h4>
@@ -114,19 +222,28 @@
     }
 
     <input type="hidden" name="Id" value="@Model.Id">
+
     <div id="btn-bar">
-        <button type="submit" class="btn btn-primary">Сохранить</button>
-        <button type="submit" class="btn btn-secondary" asp-action="CheckSaveAs" asp-controller="Main" method="post"
-                title="Сохранить РПД под другим именем (уже введено на странице вверху)">
-            Сохранить как
-        </button>
-        <button type="submit" class="btn btn-danger text-white" asp-action="DeleteRdp" asp-controller="Main"
-                method="post" title="Удалит открытую сейчас РПД"
-                onclick="return confirm('Вы действительно хотите удалить этот РПД?');">
-            Удалить
-        </button>
-        <a asp-action="DownloadFos" asp-controller="Main" asp-route-id="@Model.Id" class="btn btn-success">Скачать ФОС</a>
-        <a asp-action="DownloadRpd" asp-controller="Main" asp-route-id="@Model.Id" class="btn btn-success">Скачать РПД</a>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="submit" class="btn btn-secondary" asp-action="CheckSaveAs" asp-controller="Main"
+                    title="Сохранить РПД под другим именем">
+                Сохранить как
+            </button>
+            <button type="submit" class="btn btn-danger text-white" asp-action="DeleteRdp" asp-controller="Main"
+                    title="Удалить открытую РПД"
+                    onclick="return confirm('Вы действительно хотите удалить этот РПД?');">
+                Удалить
+            </button>
+        </div>
+        <div class="btn-group">
+            <a asp-action="DownloadFos" asp-controller="Main" asp-route-id="@Model.Id" class="btn btn-success">Скачать
+                ФОС</a>
+            <a asp-action="DownloadRpd" asp-controller="Main" asp-route-id="@Model.Id" class="btn btn-success">Скачать
+                РПД</a>
+            <a asp-action="DownloadAnn" asp-controller="Main" asp-route-id="@Model.Id" class="btn btn-success">Скачать
+                Аннотацию</a>
+        </div>
     </div>
 </form>
 
@@ -136,4 +253,121 @@
         justify-content: space-between;
         margin: 10px 0;
     }
+
+    .btn-group {
+        display: flex;
+        gap: 5px;
+    }
+
+    .topic-table {
+        width: 100%;
+        margin-bottom: 0.5em;
+        border-collapse: collapse;
+    }
+
+    .topic-table th, .topic-table td {
+        padding: 2px 4px;
+        vertical-align: top;
+    }
+
+    .topic-table th {
+        text-align: left;
+        font-weight: bold;
+    }
+
+    .topic-table textarea, .topic-table input[type="number"] {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .topic-total {
+        margin-bottom: 1em;
+        font-style: italic;
+    }
+
+    .comp-table {
+        width: 100%;
+        margin-bottom: 1em;
+        border-collapse: collapse;
+    }
+
+    .comp-table th, .comp-table td {
+        padding: 2px 4px;
+        vertical-align: top;
+    }
+
+    .comp-table th {
+        text-align: left;
+        font-weight: bold;
+    }
+
+    .comp-table textarea, .comp-table input {
+        width: 100%;
+        box-sizing: border-box;
+    }
 </style>
+
+<script>
+    function updateTotals() {
+        document.querySelectorAll('.topic-table').forEach(function (table) {
+            var suffix = table.dataset.totalId;
+            var oTotal = 0, zTotal = 0;
+            table.querySelectorAll('tbody tr').forEach(function (row) {
+                var inputs = row.querySelectorAll('input[type="number"]');
+                if (inputs.length >= 2) {
+                    oTotal += parseInt(inputs[0].value) || 0;
+                    zTotal += parseInt(inputs[1].value) || 0;
+                }
+            });
+            var oEl = document.getElementById(suffix + '-o');
+            var zEl = document.getElementById(suffix + '-z');
+            if (oEl) oEl.textContent = oTotal;
+            if (zEl) zEl.textContent = zTotal;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        updateTotals();
+        document.querySelectorAll('.topic-table input[type="number"]').forEach(function (input) {
+            input.addEventListener('input', updateTotals);
+        });
+    });
+</script>
+
+@functions {
+
+    private void RenderTopicTable(string title, IReadOnlyList<string> names, IReadOnlyList<int> hoursO, IReadOnlyList<int> hoursZ,
+        string nameField, string ohField, string zhField, string totalId)
+    {
+        var count = Math.Max(names.Count, Math.Max(hoursO.Count, hoursZ.Count));
+        <h4>@title</h4>
+        <table class="topic-table" data-total-id="@totalId">
+            <thead>
+            <tr>
+                <th style="width:60%">Тема</th>
+                <th style="width:20%">Часы (очная)</th>
+                <th style="width:20%">Часы (заочная)</th>
+            </tr>
+            </thead>
+            <tbody>
+            @for (int i = 0; i < count; i++)
+            {
+                <tr>
+                    <td><textarea name="@nameField"
+                                  class="form-control form-control-sm">@(i < names.Count ? names[i] : "")</textarea>
+                    </td>
+                    <td><input type="number" name="@(ohField)[@i]" class="form-control form-control-sm"
+                               value="@(i < hoursO.Count ? hoursO[i] : 0)" min="0"/></td>
+                    <td><input type="number" name="@(zhField)[@i]" class="form-control form-control-sm"
+                               value="@(i < hoursZ.Count ? hoursZ[i] : 0)" min="0"/></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <div class="topic-total">
+            Итого: очная — <strong><span id="@(totalId)-o">0</span></strong> ч.,
+            заочная — <strong><span id="@(totalId)-z">0</span></strong> ч.
+        </div>
+    }
+
+}
